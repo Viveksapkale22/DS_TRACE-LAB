@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>C Stack Code Tracer</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7f9;--fg:#1c2230;--mut:#6b7385;--card:#fff;--bd:#dde1ea;--acc:#2f6fed;--cur:#fff3bf;--fn:#eef3ff;--ok:#1f9d55;--code:#fbfbfd}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--fg:#e6e9f0;--mut:#98a1b5;--card:#1b2030;--bd:#2d3447;--acc:#6b9cff;--cur:#4a4120;--fn:#1d2740;--ok:#4cc38a;--code:#171b27}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:14px}
+h1{font-size:19px;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;max-width:1150px;margin:auto}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px}
+#code{font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--code);max-height:62vh;overflow:auto;border-radius:8px;border:1px solid var(--bd)}
+.ln{display:flex;white-space:pre;padding:0 8px}
+.ln i{width:30px;flex:none;color:var(--mut);font-style:normal;user-select:none}
+.ln.fn{background:var(--fn)}.ln.cur{background:var(--cur);box-shadow:inset 3px 0 var(--acc);font-weight:600}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 0}
+button{font:inherit;padding:6px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}button:disabled{opacity:.4;cursor:default}
+#cnt{color:var(--mut);font-size:13px;margin-left:auto}
+#msg{font-size:15px;margin:0 0 6px}#op{font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--ok);margin:0;min-height:20px}
+.col{display:flex;flex-direction:column;gap:12px}
+#stk{display:flex;flex-direction:column;gap:3px}
+.cell{display:flex;align-items:center;gap:8px;height:28px}
+.cell b{width:48px;font:12px ui-monospace,monospace;color:var(--mut);font-weight:400}
+.cell span{flex:1;max-width:170px;height:100%;border:1px dashed var(--bd);border-radius:6px;display:flex;align-items:center;justify-content:center;font:600 14px ui-monospace,monospace;color:var(--mut)}
+.cell.on span{border:1px solid var(--acc);color:var(--fg);background:var(--fn)}
+.cell.hi span{background:var(--cur);border-color:#e0a800}
+.cell em{font-style:normal;color:var(--acc);font-size:12px}
+.vars{font:13px ui-monospace,monospace;margin-bottom:8px}
+#fr div{font:13px ui-monospace,monospace;padding:3px 8px;border:1px solid var(--bd);border-radius:6px;margin-bottom:3px}
+#fr div:first-child{background:var(--fn);border-color:var(--acc)}
+#out{margin:0;font:13px ui-monospace,monospace;min-height:48px;white-space:pre-wrap;background:#0d1117;color:#7ee787;padding:8px;border-radius:8px}
+</style></head><body>
+<h1>C Stack Program — Line-by-Line Tracer</h1>
+<div class="grid">
+ <div class="col">
+  <div class="card"><h2>Source code <span id="where" style="text-transform:none;letter-spacing:0"></span></h2><div id="code"></div>
+   <div class="ctrl"><button id="pv">◀ Back</button><button id="nx" class="p">Next ▶</button><button id="au">Auto play</button><button id="rs">Reset</button><span id="cnt"></span></div>
+   <input id="sl" type="range" min="0" value="0" style="width:100%;margin-top:8px"></div>
+ </div>
+ <div class="col">
+  <div class="card"><h2>What happens on this line</h2><p id="msg"></p><p id="op"></p></div>
+  <div class="card"><h2>Stack memory (arr[10])</h2><div class="vars" id="vars"></div><div id="stk"></div></div>
+  <div class="card"><h2>Call stack (top = running function)</h2><div id="fr"></div></div>
+  <div class="card"><h2>Console output</h2><pre id="out"></pre></div>
+ </div>
+</div>
+<script>
+const src=`#include<stdio.h>
+#define Max 10
+
+struct Stack{
+  int arr[Max];
+  int top;
+};
+
+int isfull(struct Stack *s){
+  if(s->top == Max - 1){
+    return 1;
+  }
+  return 0;
+}
+
+int isEmpty(struct Stack *s){
+  if(s->top == -1){
+    return 1;
+  }
+  return 0;
+}
+
+void push(struct Stack *s,int value){
+  if (isfull(s)){
+    printf("Stack Overflow \\n");
+  }else{
+    s->top = s->top + 1;
+    s->arr[s->top] = value;
+    printf("Pushed %d\\n", value);
+  }
+}
+
+void pop(struct Stack *s){
+  if(isEmpty(s)){
+    printf("Stack Underflow\\n");
+  }else{
+    printf("Popped %d\\n", s->arr[s->top]);
+    s->top = s->top - 1;
+  }
+}
+
+void peek(struct Stack *s){
+  if(isEmpty(s)){
+    printf("Stack empty\\n");
+  }else{
+    printf("Top element is %d\\n", s->arr[s->top]);
+  }
+}
+
+void size(struct Stack *s){
+  if (isEmpty(s)){
+    printf("Stack is empty\\n");
+  }else{
+    printf("Stack elements (top to bottom): ");
+    for(int i = s->top; i>= 0; i--){
+        printf("%d\\n",s->arr[i]);
+    }
+    printf("\\n");
+  }
+}
+
+int main(){
+  struct Stack s;
+  s.top = -1;
+
+  push(&s, 10);
+  push(&s, 20);
+  push(&s, 30);
+  pop(&s);
+  peek(&s);
+  pop(&s);
+  push(&s, 40);
+  push(&s, 50);
+  push(&s, 60);
+  size(&s);
+
+  return 0;
+}`.split('\n');
+const R={isfull:[9,14],isEmpty:[16,21],push:[23,31],pop:[33,40],peek:[42,48],size:[50,60],main:[62,77]};
+// ---------- build trace (steps are generated by really running the logic) ----------
+const st={arr:Array(10).fill(null),top:null};let out='';const fr=['main()'],steps=[];
+const S=(line,msg,op='',hi=-1)=>steps.push({line,msg,op,hi,arr:st.arr.slice(),top:st.top,out,fr:fr.slice()});
+function isfull(){fr.unshift('isfull(s)');S(9,'Control jumps INTO isfull(). It gets the pointer s, so it sees the same stack as main.');
+ const r=st.top===9;S(10,`Is the stack full? Test s->top == Max - 1, i.e. ${st.top} == 9 → ${r?'TRUE':'FALSE'}.`,`${st.top} == 9  →  ${r}`);
+ S(r?11:13,r?'Condition true → return 1 (full).':'Condition false, so skip the block and reach return 0 (not full).',`return ${+r}`);fr.shift();return r}
+function isEmpty(){fr.unshift('isEmpty(s)');S(16,'Control jumps INTO isEmpty(). It receives pointer s.');
+ const r=st.top===-1;S(17,`Is the stack empty? Test s->top == -1 → ${st.top} == -1 → ${r?'TRUE':'FALSE'}.`,`${st.top} == -1  →  ${r}`);
+ S(r?18:20,r?'Condition true → return 1 (empty).':'Condition false → falls to return 0 (has elements).',`return ${+r}`);fr.shift();return r}
+function push(v,cl){S(cl,`main calls push(&s, ${v}). Execution jumps into push().`,`value = ${v}`);fr.unshift(`push(&s, ${v})`);
+ S(23,`Inside push: s points to main’s stack, value = ${v}.`);
+ S(24,'The if-condition needs isfull(s), so push() calls isfull() first.');
+ const f=isfull();S(24,`Back in push(): isfull returned ${+f} → ${f?'overflow':'not full, so take the else branch'}.`);
+ if(f){out+='Stack Overflow \n';S(25,'Stack is full: print the overflow message, nothing is stored.')}
+ else{const o=st.top;st.top++;S(27,'Move top up by one to open a new slot.',`top: ${o} → ${st.top}`,st.top);
+  st.arr[st.top]=v;S(28,`Store the value in the new top slot.`,`arr[${st.top}] = ${v}`,st.top);
+  out+=`Pushed ${v}\n`;S(29,`Print confirmation.`,`Pushed ${v}`,st.top)}
+ S(31,'End of push() → return to main().');fr.shift()}
+function pop(cl){S(cl,'main calls pop(&s). Execution jumps into pop().');fr.unshift('pop(&s)');S(33,'Inside pop: s points to the stack.');
+ S(34,'The if-condition needs isEmpty(s), so pop() calls isEmpty() first.');const e=isEmpty();
+ S(34,`Back in pop(): isEmpty returned ${+e} → ${e?'underflow':'has data, so take the else branch'}.`);
+ if(e){out+='Stack Underflow\n';S(35,'Nothing to remove: print underflow.')}
+ else{const v=st.arr[st.top];out+=`Popped ${v}\n`;S(37,`Print the top element before removing it.`,`arr[${st.top}] = ${v}`,st.top);
+  const o=st.top;st.top--;S(38,`Move top down by one. The value ${v} stays in memory but is now above top, so it counts as removed.`,`top: ${o} → ${st.top}`,o)}
+ S(40,'End of pop() → return to main().');fr.shift()}
+function peek(cl){S(cl,'main calls peek(&s). It only reads, never changes top.');fr.unshift('peek(&s)');S(42,'Inside peek.');
+ S(43,'Needs isEmpty(s) first.');const e=isEmpty();S(43,`isEmpty returned ${+e} → ${e?'empty':'take else branch'}.`);
+ if(e){out+='Stack empty\n';S(44,'Print empty message.')}
+ else{out+=`Top element is ${st.arr[st.top]}\n`;S(46,'Print the element at index top without removing it.',`arr[${st.top}] = ${st.arr[st.top]}`,st.top)}
+ S(48,'End of peek() → return to main().');fr.shift()}
+function size(cl){S(cl,'main calls size(&s). Despite the name, this prints all elements from top to bottom.');fr.unshift('size(&s)');S(50,'Inside size.');
+ S(51,'Needs isEmpty(s) first.');const e=isEmpty();S(51,`isEmpty returned ${+e}.`);
+ if(e){out+='Stack is empty\n';S(52,'Print empty message.')}
+ else{out+='Stack elements (top to bottom): ';S(54,'Print the heading (no newline).');
+  for(let i=st.top;i>=0;i--){S(55,i===st.top?`for loop starts: int i = s->top = ${i}. Check i >= 0 → true.`:`i-- gives i = ${i}. Check i >= 0 → true.`,`i = ${i}`,i);
+   out+=`${st.arr[i]}\n`;S(56,`Print arr[${i}].`,`arr[${i}] = ${st.arr[i]}`,i)}
+  S(55,'i-- gives i = -1. Check i >= 0 → false, so the loop ends.','i = -1');
+  out+='\n';S(58,'Print a blank line.');}
+ S(60,'End of size() → return to main().');fr.shift()}
+S(62,'Program starts: the operating system calls main().');
+S(63,'Declare s of type struct Stack. arr and top hold garbage values until we set them.');
+st.top=-1;S(64,'top = -1 is the convention for an EMPTY stack (no valid index yet).','s.top = -1');
+push(10,66);push(20,67);push(30,68);pop(69);peek(70);pop(71);push(40,72);push(50,73);push(60,74);size(75);
+S(76,'return 0 tells the OS the program finished successfully.','return 0');S(77,'End of main(). Program exits.');
+// ---------- UI ----------
+const $=id=>document.getElementById(id);let i=0,timer=null;
+const codeEl=$('code');
+codeEl.innerHTML=src.map((t,k)=>`<div class="ln" id="l${k+1}"><i>${k+1}</i><span></span></div>`).join('');
+codeEl.querySelectorAll('.ln span').forEach((s,k)=>s.textContent=src[k]);
+$('sl').max=steps.length-1;
+function render(){const s=steps[i];const name=s.fr[0].split('(')[0],[a,b]=R[name];
+ for(let k=1;k<=src.length;k++){const e=$('l'+k);e.className='ln'+(k>=a&&k<=b?' fn':'')+(k===s.line?' cur':'')}
+ $('l'+s.line).scrollIntoView({block:'nearest'});
+ $('where').textContent='— inside '+name+'()';
+ $('msg').textContent=s.msg;$('op').textContent=s.op?'⚙ '+s.op:'';
+ $('vars').textContent='s.top = '+(s.top===null?'? (uninitialised)':s.top);
+ let h='';for(let k=9;k>=0;k--){const on=s.top!==null&&k<=s.top;
+  h+=`<div class="cell${on?' on':''}${s.hi===k?' hi':''}"><b>arr[${k}]</b><span>${on?s.arr[k]:(s.arr[k]!==null?'<small>'+s.arr[k]+' (stale)</small>':'—')}</span>${s.top===k?'<em>← top</em>':''}</div>`}
+ $('stk').innerHTML=h;
+ $('fr').innerHTML=s.fr.map(f=>`<div>${f}</div>`).join('');
+ $('out').textContent=s.out||' ';
+ $('cnt').textContent=`Step ${i+1} / ${steps.length}`;$('sl').value=i;
+ $('pv').disabled=i===0;$('nx').disabled=i===steps.length-1;if(i===steps.length-1)stop()}
+function go(n){i=Math.max(0,Math.min(steps.length-1,n));render()}
+function stop(){clearInterval(timer);timer=null;$('au').textContent='Auto play'}
+$('nx').onclick=()=>go(i+1);$('pv').onclick=()=>go(i-1);$('rs').onclick=()=>{stop();go(0)};
+$('sl').oninput=e=>go(+e.target.value);
+$('au').onclick=()=>{if(timer){stop();return}if(i===steps.length-1)go(0);$('au').textContent='Pause';timer=setInterval(()=>go(i+1),1100)};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+render();
+</script></body></html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Circular Queue</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7f9;--fg:#1c2230;--mut:#6b7385;--card:#fff;--bd:#dde1ea;--acc:#2f6fed;--cur:#fff3bf;--fn:#eef3ff;--ok:#1f9d55;--code:#fbfbfd}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--fg:#e6e9f0;--mut:#98a1b5;--card:#1b2030;--bd:#2d3447;--acc:#6b9cff;--cur:#4a4120;--fn:#1d2740;--ok:#4cc38a;--code:#171b27}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:14px}
+h1{font-size:19px;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;max-width:1150px;margin:auto}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px}
+#code{font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--code);max-height:62vh;overflow:auto;border-radius:8px;border:1px solid var(--bd)}
+.ln{display:flex;white-space:pre;padding:0 8px}.ln i{width:30px;flex:none;color:var(--mut);font-style:normal;user-select:none}
+.ln.fn{background:var(--fn)}.ln.cur{background:var(--cur);box-shadow:inset 3px 0 var(--acc);font-weight:600}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 0}
+button{font:inherit;padding:6px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}button:disabled{opacity:.4;cursor:default}
+#cnt{color:var(--mut);font-size:13px;margin-left:auto}
+#msg{margin:0 0 6px}#msg.wrap{background:var(--cur);border-left:3px solid #e0a800;padding:4px 8px;border-radius:6px}#op{font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--ok);margin:0;min-height:20px}
+.col{display:flex;flex-direction:column;gap:12px}
+.vars{font:13px ui-monospace,monospace;margin-bottom:8px}
+#row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.c{flex:1;min-width:52px;text-align:center}
+.c .t{height:20px;font:600 12px ui-monospace,monospace;color:var(--acc)}
+.c .b{height:46px;border:1px dashed var(--bd);border-radius:8px;display:flex;align-items:center;justify-content:center;font:600 16px ui-monospace,monospace;color:var(--mut)}
+.c.on .b{border:1px solid var(--acc);color:var(--fg);background:var(--fn)}.c.hi .b{background:var(--cur);border-color:#e0a800}
+.c .n{font:12px ui-monospace,monospace;color:var(--mut);margin-top:2px}
+.rc{fill:var(--card);stroke:var(--bd);stroke-dasharray:3}.rc.on{fill:var(--fn);stroke:var(--acc);stroke-dasharray:none}.rc.hi{fill:var(--cur)}
+#ring text{fill:var(--fg);font:600 13px ui-monospace,monospace;text-anchor:middle}#ring .l{fill:var(--acc);font-size:11px}
+#fr div{font:13px ui-monospace,monospace;padding:3px 8px;border:1px solid var(--bd);border-radius:6px;margin-bottom:3px}
+#fr div:first-child{background:var(--fn);border-color:var(--acc)}
+#out{margin:0;font:13px ui-monospace,monospace;min-height:48px;white-space:pre-wrap;tab-size:4;background:#0d1117;color:#7ee787;padding:8px;border-radius:8px}
+</style></head><body>
+<h1>Circular Queue — Line-by-Line Tracer</h1>
+<div class="grid">
+ <div class="col"><div class="card"><h2>Source code <span id="where" style="text-transform:none;letter-spacing:0"></span></h2><div id="code"></div>
+  <div class="ctrl"><button id="pv">◀ Back</button><button id="nx" class="p">Next ▶</button><button id="au">Auto play</button><button id="rs">Reset</button><button id="jw" style="display:none">🔄 Next wrap-around</button><span id="cnt"></span></div>
+  <input id="sl" type="range" min="0" value="0" style="width:100%;margin-top:8px"></div></div>
+ <div class="col">
+  <div class="card"><h2>What happens on this line</h2><p id="msg"></p><p id="op"></p></div>
+  <div class="card"><h2>Queue memory (item[5])</h2><div class="vars" id="vars"></div><div id="row"></div><svg id="ring" viewBox="0 0 260 260" style="display:none;max-width:260px;margin:8px auto 0"></svg></div>
+  <div class="card"><h2>Call stack (top = running function)</h2><div id="fr"></div></div>
+  <div class="card"><h2>Console output</h2><pre id="out"></pre></div>
+ </div></div>
+<script>
+const SRC=["#include <stdio.h>", "#define MAX 5", "", "struct CQueue {", "    int item[MAX];", "    int front, rear;", "};", "", "int isCfull(struct CQueue *q) {", "    if ((q->rear + 1) % MAX == q->front) return 1;", "    return 0;", "}", "", "int isCempty(struct CQueue *q) {", "    if (q->front == -1) return 1;", "    return 0;", "}", "", "void C_enqueue(struct CQueue *q, int value) {", "    if (isCfull(q)) {", "        printf(\"Circular Overflow!\\n\");", "        return;", "    }", "    if (q->front == -1) {", "        q->front = 0;", "    }", "    q->rear = (q->rear + 1) % MAX;", "    q->item[q->rear] = value;", "    printf(\"C_Inserted: %d\\n\", value);", "}", "", "void C_dequeue(struct CQueue *q) {", "    if (isCempty(q)) {", "        printf(\"Circular Underflow!\\n\");", "        return;", "    }", "    printf(\"C_Dequeued: %d\\n\", q->item[q->front]);", "    if (q->front == q->rear) {", "        q->front = -1;", "        q->rear = -1;", "    } else {", "        q->front = (q->front + 1) % MAX;", "    }", "}", "", "void C_display(struct CQueue *q) {", "    if (isCempty(q)) {", "        printf(\"Queue is empty.\\n\");", "        return;", "    }", "    printf(\"C_Queue elements: \");", "    int i = q->front;", "    while (1) {", "        printf(\"%d\\t\", q->item[i]);", "        if (i == q->rear) break;", "        i = (i + 1) % MAX;", "    }", "    printf(\"\\n\");", "}", "", "void C_peek(struct CQueue *q) {", "    if (isCempty(q)) {", "        printf(\"Queue is empty.\\n\");", "        return;", "    }", "    printf(\"Front element: %d\\n\", q->item[q->front]);", "}", "", "int main() {", "    struct CQueue cq = { .front = -1, .rear = -1 };", "    printf(\"\\n--- Circular Queue ---\\n\");", "", "    // Phase 1: fill the queue completely, then try one more", "    C_enqueue(&cq, 100);", "    C_enqueue(&cq, 200);", "    C_enqueue(&cq, 300);", "    C_enqueue(&cq, 400);", "    C_enqueue(&cq, 500);", "    C_enqueue(&cq, 600);", "    C_display(&cq);", "", "    // Phase 2: free two slots at the front and peek", "    C_dequeue(&cq);", "    C_dequeue(&cq);", "    C_peek(&cq);", "", "    // Phase 3: rear wraps around to slot 0 and 1", "    C_enqueue(&cq, 600);", "    C_enqueue(&cq, 700);", "    C_enqueue(&cq, 800);", "    C_display(&cq);", "", "    // Phase 4: empty it completely (front wraps too)", "    C_dequeue(&cq);", "    C_dequeue(&cq);", "    C_dequeue(&cq);", "    C_dequeue(&cq);", "    C_dequeue(&cq);", "    C_dequeue(&cq);", "    C_display(&cq);", "    C_peek(&cq);", "", "    return 0;", "}"],R={"isCfull": [9, 12], "isCempty": [14, 17], "C_enqueue": [19, 30], "C_dequeue": [32, 44], "C_display": [46, 59], "C_peek": [61, 67], "main": [69, 104]},CIRC=true;
+const q={arr:Array(5).fill(0),front:-1,rear:-1};let out='';const fr=['main()'],steps=[];
+const S=(line,msg,op='',hi=-1,wrap=false)=>steps.push({line,msg,op,hi,wrap,arr:q.arr.slice(),front:q.front,rear:q.rear,out,fr:fr.slice()});
+const B=v=>v?'TRUE':'FALSE';
+function isCfull(){fr.unshift('isCfull(q)');S(9,'Jumps INTO isCfull(). Full means: the slot after rear (wrapping with %) is front.');
+ const n=(q.rear+1)%5,r=n===q.front;S(10,`(rear + 1) % MAX = (${q.rear} + 1) % 5 = ${n}. Compare with front = ${q.front} → ${B(r)}.`+(r?' Returns 1 (full).':''),r?'return 1':`${n} == ${q.front} is false`);
+ if(!r)S(11,'Not full → return 0.','return 0');fr.shift();return r}
+function isCempty(){fr.unshift('isCempty(q)');S(14,'Jumps INTO isCempty().');
+ const r=q.front===-1;S(15,`Test q->front == -1 → ${q.front} == -1 → ${B(r)}.`+(r?' Returns 1 (empty).':''),r?'return 1':`${q.front} == -1 is false`);
+ if(!r)S(16,'Has elements → return 0.','return 0');fr.shift();return r}
+function C_enqueue(v,cl){S(cl,`main calls C_enqueue(&cq, ${v}). Execution jumps into C_enqueue().`,`value = ${v}`);fr.unshift(`C_enqueue(&cq, ${v})`);
+ S(19,`Inside C_enqueue: q points to main’s queue, value = ${v}.`);S(20,'The if needs isCfull(q), so it calls isCfull() first.');
+ const f=isCfull();S(20,`isCfull returned ${+f} → ${f?'queue full':'not full, continue'}.`);
+ if(f){out+='Circular Overflow!\n';S(21,'Print overflow message.');S(22,'return early.');fr.shift();return}
+ const first=q.front===-1;S(24,`First element? q->front == -1 → ${q.front} == -1 → ${B(first)}.`);
+ if(first){q.front=0;S(25,'First insertion: front starts at index 0.','front: -1 → 0',0)}
+ const o=q.rear,w=o===4;q.rear=(q.rear+1)%5;S(27,(w?'🔄 WRAP-AROUND! ':'')+`Advance rear with %: (${o} + 1) % 5 = ${q.rear}.`+(w?' rear was on the LAST slot (4), so it jumps back to slot 0 instead of running off the array.':''),`rear: ${o} → ${q.rear}`,q.rear,w);
+ q.arr[q.rear]=v;S(28,'Store the value at rear.',`item[${q.rear}] = ${v}`,q.rear);
+ out+=`C_Inserted: ${v}\n`;S(29,'Print confirmation.',`C_Inserted: ${v}`,q.rear);S(30,'End of C_enqueue() → return to main().');fr.shift()}
+function C_dequeue(cl){S(cl,'main calls C_dequeue(&cq).');fr.unshift('C_dequeue(&cq)');S(32,'Inside C_dequeue.');
+ S(33,'Needs isCempty(q) first.');const e=isCempty();S(33,`isCempty returned ${+e} → ${e?'underflow':'has data, continue'}.`);
+ if(e){out+='Circular Underflow!\n';S(34,'Print underflow.');S(35,'return early.');fr.shift();return}
+ out+=`C_Dequeued: ${q.arr[q.front]}\n`;S(37,'Print the element at FRONT.',`item[${q.front}] = ${q.arr[q.front]}`,q.front);
+ const same=q.front===q.rear;S(38,`Only one element? front == rear → ${q.front} == ${q.rear} → ${B(same)}.`);
+ if(same){q.front=-1;S(39,'Reset front to -1.','front = -1');q.rear=-1;S(40,'Reset rear to -1: queue empty.','rear = -1')}
+ else{const o=q.front,w=o===4;q.front=(q.front+1)%5;S(42,(w?'🔄 WRAP-AROUND! ':'')+`Advance front with %: (${o} + 1) % 5 = ${q.front}.`+(w?' front was on the LAST slot (4), so it wraps back to slot 0.':` Slot [${o}] is now free and can be reused by rear later.`),`front: ${o} → ${q.front}`,o,w)}
+ S(44,'End of C_dequeue() → return to main().');fr.shift()}
+function C_display(cl){S(cl,'main calls C_display(&cq).');fr.unshift('C_display(&cq)');S(46,'Inside C_display: only reads.');
+ S(47,'Needs isCempty(q) first.');const e=isCempty();S(47,`isCempty returned ${+e}.`);
+ if(e){out+='Queue is empty.\n';S(48,'Print empty message.');S(49,'return early.');fr.shift();return}
+ out+='C_Queue elements: ';S(51,'Print the heading (no newline).');
+ let i=q.front;S(52,`Start walking at the front: i = ${i}.`,`i = ${i}`,i);S(53,'while(1) is always true; the loop ends only through break.');
+ for(;;){out+=q.arr[i]+'\t';S(54,`Print item[${i}] followed by a tab.`,`item[${i}] = ${q.arr[i]}`,i);
+  const b=i===q.rear;S(55,`Reached rear? i == rear → ${i} == ${q.rear} → ${B(b)}.`+(b?' break leaves the loop.':''),'',i);if(b)break;
+  const o=i,w=o===4;i=(i+1)%5;S(56,(w?'🔄 WRAP-AROUND! ':'')+`Next index with %: (${o} + 1) % 5 = ${i}.`+(w?' The walk passed the last slot, so it continues from slot 0.':''),`i = ${i}`,i,w)}
+ out+='\n';S(58,'Print a newline.');S(59,'End of C_display() → return to main().');fr.shift()}
+function C_peek(cl){S(cl,'main calls C_peek(&cq). It only READS the front element; nothing is removed.');fr.unshift('C_peek(&cq)');S(61,'Inside C_peek.');
+ S(62,'Needs isCempty(q) first.');const e=isCempty();S(62,`isCempty returned ${+e}.`);
+ if(e){out+='Queue is empty.\n';S(63,'Print empty message.');S(64,'return early.');fr.shift();return}
+ out+=`Front element: ${q.arr[q.front]}\n`;S(66,'Print item[front] without moving front.',`item[${q.front}] = ${q.arr[q.front]}`,q.front);S(67,'End of C_peek() → return to main().');fr.shift()}
+const FN={C_enqueue:(v,c)=>C_enqueue(v,c),C_dequeue:(v,c)=>C_dequeue(c),C_display:(v,c)=>C_display(c),C_peek:(v,c)=>C_peek(c)};
+const M0=SRC.findIndex(l=>l.startsWith('int main'));
+S(M0+1,'Program starts: the OS calls main().');
+for(let k=M0+1;k<SRC.length;k++){const t=SRC[k].trim(),ln=k+1;if(!t)continue;
+ if(t.startsWith('struct'))S(ln,'Create the circular queue: front = -1, rear = -1; item[] is zero-filled.','front = -1, rear = -1');
+ else if(t.startsWith('printf')){out+='\n--- Circular Queue ---\n';S(ln,'Print a blank line and the heading.')}
+ else if(t.startsWith('//'))S(ln,'▶ '+t.slice(2).trim()+'.');
+ else if(t.startsWith('return 0'))S(ln,'return 0 → program finished successfully.','return 0');
+ else if(t==='}'&&k===SRC.length-1)S(ln,'End of main().');
+ else{const m=t.match(/^(C_\w+)\(&cq(?:, (\d+))?\);/);if(m)FN[m[1]](m[2]?+m[2]:0,ln)}}
+
+const $=id=>document.getElementById(id);let i=0,timer=null;
+$('code').innerHTML=SRC.map((t,k)=>`<div class="ln" id="l${k+1}"><i>${k+1}</i><span></span></div>`).join('');
+$('code').querySelectorAll('.ln span').forEach((s,k)=>s.textContent=SRC[k]);
+$('sl').max=steps.length-1;if(CIRC){$('ring').style.display='block';$('jw').style.display='';$('jw').onclick=()=>{stop();const k=steps.findIndex((x,j)=>j>i&&x.wrap);go(k<0?steps.findIndex(x=>x.wrap):k)}}
+const act=(s,k)=>s.front===-1?false:CIRC?(k-s.front+5)%5<=(s.rear-s.front+5)%5:(k>=s.front&&k<=s.rear);
+function render(){const s=steps[i],name=s.fr[0].split('(')[0],[a,b]=R[name];
+ for(let k=1;k<=SRC.length;k++)$('l'+k).className='ln'+(k>=a&&k<=b?' fn':'')+(k===s.line?' cur':'');
+ $('l'+s.line).scrollIntoView({block:'nearest'});
+ $('where').textContent='— inside '+name+'()';$('msg').textContent=s.msg;$('msg').className=s.wrap?'wrap':'';$('op').textContent=s.op?'⚙ '+s.op:'';
+ $('vars').textContent=`front = ${s.front},  rear = ${s.rear}  `+(s.front===-1?'(queue empty)':'');
+ let h='',g='';for(let k=0;k<5;k++){const on=act(s,k),tag=[s.front===k?'F':'',s.rear===k?'R':''].filter(Boolean).join(',');
+  h+=`<div class="c${on?' on':''}${s.hi===k?' hi':''}"><div class="t">${tag?'▼ '+tag:''}</div><div class="b">${on?s.arr[k]:(s.arr[k]?s.arr[k]+'·':'—')}</div><div class="n">[${k}]</div></div>`;
+  const an=(-90+k*72)*Math.PI/180,x=130+80*Math.cos(an),y=130+80*Math.sin(an),lx=130+118*Math.cos(an),ly=130+118*Math.sin(an)+4;
+  g+=`<circle class="rc${on?' on':''}${s.hi===k?' hi':''}" cx="${x}" cy="${y}" r="24"/><text x="${x}" y="${y+5}">${on?s.arr[k]:''}</text><text class="l" x="${lx}" y="${ly}">[${k}]${tag?' '+tag:''}</text>`}
+ $('row').innerHTML=h;$('ring').innerHTML=g;
+ $('fr').innerHTML=s.fr.map(f=>`<div>${f}</div>`).join('');$('out').textContent=s.out||' ';
+ $('cnt').textContent=`Step ${i+1} / ${steps.length}`;$('sl').value=i;$('pv').disabled=i===0;$('nx').disabled=i===steps.length-1;if(i===steps.length-1)stop()}
+function go(n){i=Math.max(0,Math.min(steps.length-1,n));render()}
+function stop(){clearInterval(timer);timer=null;$('au').textContent='Auto play'}
+$('nx').onclick=()=>go(i+1);$('pv').onclick=()=>go(i-1);$('rs').onclick=()=>{stop();go(0)};$('sl').oninput=e=>go(+e.target.value);
+$('au').onclick=()=>{if(timer){stop();return}if(i===steps.length-1)go(0);$('au').textContent='Pause';timer=setInterval(()=>go(i+1),1100)};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+render();
+</script></body></html>

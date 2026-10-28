@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Doubly Linked List – End Insertion & Deletion</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7f9;--fg:#1c2230;--mut:#6b7385;--card:#fff;--bd:#dde1ea;--acc:#2f6fed;--cur:#fff3bf;--fn:#eef3ff;--ok:#1f9d55;--code:#fbfbfd}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--fg:#e6e9f0;--mut:#98a1b5;--card:#1b2030;--bd:#2d3447;--acc:#6b9cff;--cur:#4a4120;--fn:#1d2740;--ok:#4cc38a;--code:#171b27}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:14px}
+h1{font-size:19px;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:12px;max-width:1200px;margin:auto}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px}
+#code{font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--code);max-height:62vh;overflow:auto;border-radius:8px;border:1px solid var(--bd)}
+.ln{display:flex;white-space:pre;padding:0 8px}.ln i{width:30px;flex:none;color:var(--mut);font-style:normal;user-select:none}
+.ln.fn{background:var(--fn)}.ln.cur{background:var(--cur);box-shadow:inset 3px 0 var(--acc);font-weight:600}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 0}
+button{font:inherit;padding:6px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}button:disabled{opacity:.4;cursor:default}
+#cnt{color:var(--mut);font-size:13px;margin-left:auto}
+#msg{margin:0 0 6px}#op{font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--ok);margin:0;min-height:20px}
+.col{display:flex;flex-direction:column;gap:12px}
+.vars{font:12px ui-monospace,monospace;margin-bottom:8px;color:var(--mut)}
+.row{display:flex;flex-wrap:wrap;row-gap:10px;align-items:flex-start}
+.nd{display:flex;flex-direction:column;align-items:center}.tg{min-height:18px;font:600 11px ui-monospace,monospace;color:var(--acc)}
+.bx{display:flex;border:1px solid var(--acc);border-radius:6px;background:var(--fn);font:600 13px ui-monospace,monospace}
+.bx span{padding:6px 10px}.bx .nx{border-left:1px solid var(--acc);color:var(--mut);font-size:11px;display:flex;align-items:center}
+.bx .pv{border-left:0;border-right:1px solid var(--acc)}.bx.hi{background:var(--cur);border-color:#e0a800}.bx.fr{opacity:.5;text-decoration:line-through;border-style:dashed}
+.bx.nl{border-color:var(--bd);color:var(--mut);background:none;padding:6px 10px}
+.ad{font:10px ui-monospace,monospace;color:var(--mut)}.ar{color:var(--mut);padding:24px 5px 0}
+.sub{font-size:12px;color:var(--mut);margin:10px 0 4px}
+#fr div{font:13px ui-monospace,monospace;padding:3px 8px;border:1px solid var(--bd);border-radius:6px;margin-bottom:3px}
+#fr div:first-child{background:var(--fn);border-color:var(--acc)}
+#out{margin:0;font:13px ui-monospace,monospace;min-height:48px;white-space:pre-wrap;background:#0d1117;color:#7ee787;padding:8px;border-radius:8px}
+</style></head><body>
+<h1>Doubly Linked List – End Insertion & Deletion — Line-by-Line Tracer</h1>
+<div class="grid">
+ <div class="col"><div class="card"><h2>Source code <span id="where" style="text-transform:none;letter-spacing:0"></span></h2><div id="code"></div>
+  <div class="ctrl"><button id="pv">◀ Back</button><button id="nx" class="p">Next ▶</button><button id="au">Auto play</button><button id="rs">Reset</button><span id="cnt"></span></div>
+  <input id="sl" type="range" min="0" value="0" style="width:100%;margin-top:8px"></div></div>
+ <div class="col">
+  <div class="card"><h2>What happens on this line</h2><p id="msg"></p><p id="op"></p></div>
+  <div class="card"><h2>Doubly linked list in heap memory (prev | data | next)</h2><div class="vars" id="vars"></div><div class="row" id="chain"></div><div id="extra"></div></div>
+  <div class="card"><h2>Call stack (top = running function)</h2><div id="fr"></div></div>
+  <div class="card"><h2>Console output</h2><pre id="out"></pre></div>
+ </div></div>
+<script>
+const SRC=["#include <stdio.h>", "#include <stdlib.h>", "", "struct node {", "    int data;", "    struct node *prev;", "    struct node *next;", "};", "", "struct node *head = NULL;", "", "void insertAtEnd(int new_val) {", "    struct node *new_node = (struct node*)malloc(sizeof(struct node));", "    if (new_node == NULL) {", "        printf(\"Memory allocation failed!\\n\");", "        return;", "    }", "    new_node->data = new_val;", "    new_node->next = NULL;", "", "    if (head == NULL) {", "        new_node->prev = NULL;", "        head = new_node;", "        return;", "    }", "", "    struct node *temp = head;", "    while (temp->next != NULL) {", "        temp = temp->next;", "    }", "    temp->next = new_node;", "    new_node->prev = temp;", "}", "", "void deleteAtEnd() {", "    if (head == NULL) {", "        printf(\"List is empty!\\n\");", "        return;", "    }", "    if (head->next == NULL) {", "        free(head);", "        head = NULL;", "        return;", "    }", "    struct node *temp = head;", "    while (temp->next != NULL) {", "        temp = temp->next;", "    }", "    temp->prev->next = NULL;", "    free(temp);", "}", "", "void printList() {", "    struct node *temp = head;", "    while (temp != NULL) {", "        printf(\"%d <-> \", temp->data);", "        temp = temp->next;", "    }", "    printf(\"NULL\\n\");", "}", "", "void printReverse() {", "    struct node *temp = head;", "    if (temp == NULL) {", "        printf(\"NULL\\n\");", "        return;", "    }", "    while (temp->next != NULL) {", "        temp = temp->next;", "    }", "    while (temp != NULL) {", "        printf(\"%d <-> \", temp->data);", "        temp = temp->prev;", "    }", "    printf(\"NULL\\n\");", "}", "", "int main() {", "    // Phase 1: insert at the end", "    insertAtEnd(10);", "    insertAtEnd(20);", "    insertAtEnd(30);", "    insertAtEnd(40);", "    printList();", "    printReverse();", "", "    // Phase 2: delete from the end", "    deleteAtEnd();", "    printList();", "    deleteAtEnd();", "    deleteAtEnd();", "    printList();", "", "    // Phase 3: single node, then empty list", "    deleteAtEnd();", "    deleteAtEnd();", "    printList();", "    return 0;", "}"],R={"insertAtEnd": [12, 33], "deleteAtEnd": [35, 51], "printList": [53, 60], "printReverse": [62, 76], "main": [78, 99]};
+let H={},P={head:null},nid=0,out='',steps=[],fr=['main()'];
+const A=id=>id==null?'NULL':id==='?'?'?':'0x'+(0x5a10+id*0x20).toString(16);
+const S=(line,msg,op='',hi=null)=>steps.push({line,msg,op,hi,H:JSON.parse(JSON.stringify(H)),P:{...P},out,fr:fr.slice()});
+const malloc=()=>{const id=nid++;H[id]={data:'?',prev:'?',next:'?',freed:false};return id};
+const fs=f=>SRC.findIndex(l=>/^(void|int)\s+\w+\(/.test(l)&&l.includes(f+'('));
+const hd=f=>fs(f)+1,endl=f=>SRC.findIndex((l,i)=>i>fs(f)&&l==='}')+1;
+const at=(f,t,n=0)=>{let c=0;for(let i=fs(f)+1;i<SRC.length;i++)if(SRC[i].includes(t)&&c++===n)return i+1;throw Error('line not found: '+f+' / '+t)};
+function printList(cl){const L=(t,n)=>at('printList',t,n);S(cl,'main calls printList().');fr.unshift('printList()');
+ S(hd('printList'),'Inside printList: it only reads the list, it never changes it.');
+ P.temp=P.head;S(L('temp = head'),`Create a traversal pointer temp and start it at head (${A(P.head)}).`,`temp = ${A(P.temp)}`,P.temp);
+ for(;;){const c=P.temp!=null;S(L('while'),`Loop check: temp != NULL → ${A(P.temp)} != NULL → ${c?'TRUE':'FALSE, the loop ends'}.`,'',P.temp);if(!c)break;
+  out+=`${H[P.temp].data} <-> `;S(L('printf("%d'),'Print this node’s data.',`prints ${H[P.temp].data} <->`,P.temp);
+  P.temp=H[P.temp].next;S(L('temp = temp->next'),`Move to the next node: temp = temp->next → ${A(P.temp)}${P.temp==null?' (NULL = end of list)':''}.`,`temp = ${A(P.temp)}`,P.temp)}
+ out+='NULL\n';S(L('"NULL'),'Print NULL to mark the end of the list.');delete P.temp;S(endl('printList'),'End of printList() → return to main().');fr.shift()}
+function printReverse(cl){const f='printReverse',L=(t,n)=>at(f,t,n);S(cl,'main calls printReverse(). A doubly linked list can also be read BACKWARD using the prev pointers.');fr.unshift('printReverse()');
+ S(hd(f),'Inside printReverse.');P.temp=P.head;S(L('temp = head'),`temp starts at head (${A(P.temp)}).`,`temp = ${A(P.temp)}`,P.temp);
+ const e=P.temp==null;S(L('temp == NULL'),`Empty list? temp == NULL → ${A(P.temp)} == NULL → ${e?'TRUE':'FALSE'}.`);
+ if(e){out+='NULL\n';S(L('printf("NULL',0),'Print NULL.');delete P.temp;S(L('return'),'return.');fr.shift();return}
+ for(;;){const nx=H[P.temp].next,c=nx!=null;S(L('while (temp->next'),`First walk to the LAST node. Check temp->next != NULL → ${A(nx)} != NULL → ${c?'TRUE':'FALSE: temp is the last node'}.`,'',P.temp);if(!c)break;
+  P.temp=nx;S(L('temp = temp->next'),`temp = temp->next → ${A(P.temp)}.`,`temp = ${A(P.temp)}`,P.temp)}
+ for(;;){const c=P.temp!=null;S(L('while (temp !='),`Now go backward. Check temp != NULL → ${A(P.temp)} != NULL → ${c?'TRUE':'FALSE, the loop ends'}.`,'',P.temp);if(!c)break;
+  out+=`${H[P.temp].data} <-> `;S(L('printf("%d'),'Print this node’s data.',`prints ${H[P.temp].data} <->`,P.temp);
+  P.temp=H[P.temp].prev;S(L('temp = temp->prev'),`Step BACK using the prev pointer: temp = temp->prev → ${A(P.temp)}${P.temp==null?' (NULL: passed the first node)':''}.`,`temp = ${A(P.temp)}`,P.temp)}
+ out+='NULL\n';S(L('printf("NULL',1),'Print NULL.');delete P.temp;S(endl(f),'End of printReverse() → return to main().');fr.shift()}
+function runMain(FN){const M0=SRC.findIndex(l=>l.startsWith('int main'));S(M0+1,'Program starts: the OS calls main(). The global pointer head is NULL, so the list is empty.');
+ for(let k=M0+1;k<SRC.length;k++){const t=SRC[k].trim(),ln=k+1;if(!t)continue;
+  if(t.startsWith('//'))S(ln,'▶ '+t.slice(2).trim()+'.');
+  else if(t.startsWith('return 0'))S(ln,'return 0 → program finished successfully.','return 0');
+  else if(t==='}'&&k===SRC.length-1)S(ln,'End of main().');
+  else{const m=t.match(/^(\w+)\(([^)]*)\);/);if(m)FN[m[1]](...(m[2]?m[2].split(',').map(Number):[]),ln)}}}
+function insertAtEnd(v,cl){const f='insertAtEnd',L=(t,n)=>at(f,t,n);
+ S(cl,`main calls insertAtEnd(${v}).`,`new_val = ${v}`);fr.unshift(`insertAtEnd(${v})`);S(hd(f),`Inside insertAtEnd: new_val = ${v}.`);
+ const n=malloc();P.new_node=n;S(L('malloc'),`malloc creates a new node on the heap at ${A(n)} (data, prev, next are garbage).`,`new_node = ${A(n)}`,n);
+ S(L('new_node == NULL'),'malloc succeeded: new_node == NULL is FALSE.');
+ H[n].data=v;S(L('new_node->data'),'Store the value.',`new_node->data = ${v}`,n);
+ H[n].next=null;S(L('new_node->next'),'This node will be the LAST one, so its next must be NULL.','new_node->next = NULL',n);
+ const e=P.head==null;S(L('head == NULL'),`Is the list empty? head == NULL → ${A(P.head)} == NULL → ${e?'TRUE':'FALSE'}.`);
+ if(e){H[n].prev=null;S(L('new_node->prev = NULL'),'Empty list: nothing comes before the new node, so prev = NULL.','new_node->prev = NULL',n);P.head=n;S(L('head = new_node'),'The new node becomes the head.',`head = ${A(n)}`,n);delete P.new_node;S(L('return',1),'return: nothing else to do.');fr.shift();return}
+ P.temp=P.head;S(L('temp = head'),`List is not empty, so walk to the last node. temp starts at head (${A(P.temp)}).`,`temp = ${A(P.temp)}`,P.temp);
+ for(;;){const nx=H[P.temp].next,c=nx!=null;S(L('while'),`Loop check: temp->next != NULL → ${A(nx)} != NULL → ${c?'TRUE, keep walking':'FALSE: temp is the last node'}.`,'',P.temp);if(!c)break;
+  P.temp=nx;S(L('temp = temp->next'),`Move temp forward: temp = temp->next → ${A(P.temp)}.`,`temp = ${A(P.temp)}`,P.temp)}
+ H[P.temp].next=n;S(L('temp->next = new_node'),'Forward link: the old last node’s next now points to the new node.',`temp->next = ${A(n)}`,n);
+ H[n].prev=P.temp;S(L('new_node->prev = temp'),`Backward link: the new node’s prev points to the old last node (${A(P.temp)}). Now both directions are connected.`,`new_node->prev = ${A(P.temp)}`,n);
+ delete P.temp;delete P.new_node;S(endl(f),'End of function: local pointers vanish, the nodes stay on the heap. Back to main().');fr.shift()}
+function deleteAtEnd(cl){const f='deleteAtEnd',L=(t,n)=>at(f,t,n);S(cl,'main calls deleteAtEnd().');fr.unshift('deleteAtEnd()');S(hd(f),'Inside deleteAtEnd.');
+ const e=P.head==null;S(L('head == NULL'),`Is the list empty? head == NULL → ${A(P.head)} == NULL → ${e?'TRUE':'FALSE'}.`);
+ if(e){out+='List is empty!\n';S(L('printf'),'Nothing to delete: print the message.');S(L('return'),'return early.');fr.shift();return}
+ const one=H[P.head].next==null;S(L('head->next == NULL'),`Only one node? head->next == NULL → ${A(H[P.head].next)} == NULL → ${one?'TRUE':'FALSE'}.`,'',P.head);
+ if(one){const o=P.head;H[o].freed=true;S(L('free(head)'),'Single node: free it.',`free(${A(o)})`,o);P.head=null;S(L('head = NULL'),'Reset head to NULL so it does not point at freed memory. The list is empty again.','head = NULL');S(L('return',1),'return.');fr.shift();return}
+ P.temp=P.head;S(L('temp = head'),'Walk to the LAST node. temp starts at head.',`temp = ${A(P.temp)}`,P.temp);
+ for(;;){const nx=H[P.temp].next,c=nx!=null;S(L('while'),`Loop check: temp->next != NULL → ${A(nx)} != NULL → ${c?'TRUE, keep walking':'FALSE: temp is the last node'}.`,'',P.temp);if(!c)break;
+  P.temp=nx;S(L('temp = temp->next'),`Move temp forward: temp = temp->next → ${A(P.temp)}.`,`temp = ${A(P.temp)}`,P.temp)}
+ const p=H[P.temp].prev;H[p].next=null;S(L('temp->prev->next = NULL'),`Because every node knows its previous node, temp->prev (${A(p)}) is the second-last node. Set its next to NULL: the list now ends there, and no second traversal was needed.`,'temp->prev->next = NULL',P.temp);
+ H[P.temp].freed=true;S(L('free(temp)'),`free(temp) releases the old last node at ${A(P.temp)}.`,`free(${A(P.temp)})`,P.temp);
+ delete P.temp;S(endl(f),'End of function. Back to main().');fr.shift()}
+runMain({insertAtEnd,deleteAtEnd,printList,printReverse});
+
+const $=id=>document.getElementById(id);let i=0,timer=null;
+$('code').innerHTML=SRC.map((t,k)=>`<div class="ln" id="l${k+1}"><i>${k+1}</i><span></span></div>`).join('');
+$('code').querySelectorAll('.ln span').forEach((s,k)=>s.textContent=SRC[k]);$('sl').max=steps.length-1;
+function render(){const s=steps[i],name=s.fr[0].split('(')[0],[a,b]=R[name];
+ for(let k=1;k<=SRC.length;k++)$('l'+k).className='ln'+(k>=a&&k<=b?' fn':'')+(k===s.line?' cur':'');
+ $('l'+s.line).scrollIntoView({block:'nearest'});
+ $('where').textContent='— inside '+name+'()';$('msg').textContent=s.msg;$('op').textContent=s.op?'⚙ '+s.op:'';
+ $('vars').textContent='Pointers:  '+Object.entries(s.P).map(([k,v])=>`${k} = ${A(v)}`).join('   ');
+ const tags={},nt=[];for(const[k,v]of Object.entries(s.P)){if(v==null)nt.push(k);else(tags[v]=tags[v]||[]).push(k)}
+ const nd=id=>{const n=s.H[id];return `<div class="nd"><div class="tg">${(tags[id]||[]).join(', ')}</div><div class="bx${n.freed?' fr':''}${s.hi===id?' hi':''}"><span class="nx pv">${A(n.prev)}</span><span>${n.data}</span><span class="nx">${A(n.next)}</span></div><div class="ad">${A(+id)}${n.freed?' freed':''}</div></div>`};
+ const chain=[],seen=new Set();let c=s.P.head;while(c!=null&&c!=='?'&&!seen.has(c)){seen.add(c);chain.push(c);c=s.H[c].next}
+ $('chain').innerHTML=chain.map(id=>nd(id)+'<div class="ar">⇄</div>').join('')+`<div class="nd"><div class="tg">${nt.join(', ')}</div><div class="bx nl">NULL</div></div>`;
+ const ids=Object.keys(s.H).map(Number),orph=ids.filter(x=>!seen.has(x)&&!s.H[x].freed),fre=ids.filter(x=>!seen.has(x)&&s.H[x].freed);
+ $('extra').innerHTML=(orph.length?`<div class="sub">Allocated but NOT linked into the list yet</div><div class="row">${orph.map(nd).join('')}</div>`:'')+(fre.length?`<div class="sub">Freed memory (returned to the system)</div><div class="row">${fre.map(nd).join('')}</div>`:'');
+ $('fr').innerHTML=s.fr.map(f=>`<div>${f}</div>`).join('');$('out').textContent=s.out||' ';
+ $('cnt').textContent=`Step ${i+1} / ${steps.length}`;$('sl').value=i;$('pv').disabled=i===0;$('nx').disabled=i===steps.length-1;if(i===steps.length-1)stop()}
+function go(n){i=Math.max(0,Math.min(steps.length-1,n));render()}
+function stop(){clearInterval(timer);timer=null;$('au').textContent='Auto play'}
+$('nx').onclick=()=>go(i+1);$('pv').onclick=()=>go(i-1);$('rs').onclick=()=>{stop();go(0)};$('sl').oninput=e=>go(+e.target.value);
+$('au').onclick=()=>{if(timer){stop();return}if(i===steps.length-1)go(0);$('au').textContent='Pause';timer=setInterval(()=>go(i+1),1100)};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+render();
+</script></body></html>

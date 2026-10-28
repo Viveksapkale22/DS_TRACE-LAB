@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DS_TRACE LAB | Learn Data Structures in C, Line by Line</title>
+<meta name="description" content="DS_TRACE LAB: interactive, step-by-step code tracers for stack, queue and linked list data structures in C.">
+<meta name="author" content="Vivek">
+<link rel="canonical" href="https://vivek-22.tech/">
+<style>
+:root{--bg:#0d1017;--sf:#161b26;--tx:#eef0f5;--mu:#97a0b4;--ac:#ff8a4c;--ac2:#3bc9db;--bd:#262d3d;--ok:#51cf66}
+:root[data-theme="light"]{--bg:#f6f4ee;--sf:#fff;--tx:#1b1f2a;--mu:#5d6475;--ac:#e8590c;--ac2:#0b7285;--bd:#e2ded2;--ok:#2b8a3e}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 "Segoe UI",system-ui,sans-serif;transition:background .3s,color .3s}
+.w{max-width:1040px;margin:0 auto;padding:0 18px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:18px 0;gap:10px}
+.logo{font-weight:800;letter-spacing:1px;font-size:1.15rem}.logo b{color:var(--ac)}
+.nb{display:flex;gap:8px;align-items:center}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:9px 16px;font-weight:700;cursor:pointer;text-decoration:none;font-size:.95rem;display:inline-block}
+.btn.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;padding:30px 0 20px}
+@media(max-width:800px){.hero{grid-template-columns:1fr}}
+h1{font-size:clamp(2.1rem,6vw,3.5rem);line-height:1.08;margin:0 0 .3em}h1 span{color:var(--ac)}
+.sub{color:var(--mu);font-size:1.08rem;max-width:540px}
+.term{background:#0a0d13;color:#d6dbe6;border-radius:12px;padding:14px 16px;font:14px/1.7 Consolas,Menlo,monospace;min-height:112px;margin-top:18px;border:1px solid var(--bd);white-space:pre-wrap}
+.term .k{color:#ff8a4c}.cur{display:inline-block;width:8px;height:1em;background:#ff8a4c;vertical-align:-2px;animation:b 1s steps(1) infinite}@keyframes b{50%{opacity:0}}
+.demo{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:18px}
+.demo h4{margin:0 0 4px}.demo p{margin:0 0 10px;color:var(--mu);font-size:.9rem}
+.stk{display:flex;flex-direction:column-reverse;gap:6px;height:230px;justify-content:flex-start;border-bottom:3px solid var(--ac2);padding-bottom:6px}
+.it{height:36px;border:2px solid var(--ac2);border-radius:8px;text-align:center;font-weight:800;line-height:32px;animation:pop .25s}
+.it.top{border-color:var(--ac);color:var(--ac)}@keyframes pop{from{transform:scale(.6) translateY(-30px);opacity:0}}
+.msg{min-height:1.5em;font-size:.9rem;color:var(--ac);margin:8px 0}.shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:26px 0 8px}
+.tools input{flex:1;min-width:200px;background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;font-size:1rem}
+.chip{background:var(--sf);color:var(--mu);border:1px solid var(--bd);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:.9rem}
+.chip.on{background:var(--ac2);color:#fff;border-color:var(--ac2)}
+.prog{height:8px;background:var(--bd);border-radius:9px;overflow:hidden;margin:6px 0 4px}.prog div{height:100%;background:var(--ok);width:0;transition:width .4s}
+.pt{color:var(--mu);font-size:.85rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;margin:18px 0 10px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px;transition:transform .2s,border-color .2s;opacity:0;transform:translateY(14px)}
+.card.in{opacity:1;transform:none}.card:hover{transform:translateY(-4px);border-color:var(--ac)}
+.card .g{color:var(--ac2);font-weight:800;font-size:.75rem;letter-spacing:1px}
+.card h3{margin:0;font-size:1.15rem}.card p{margin:0;color:var(--mu);font-size:.92rem;flex:1}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card.done{border-color:var(--ok)}.card label{font-size:.85rem;color:var(--mu);cursor:pointer;display:flex;gap:6px;align-items:center}
+.empty{color:var(--mu);padding:20px 0}
+footer{border-top:1px solid var(--bd);margin-top:46px;padding:26px 0 40px;color:var(--mu);font-size:.9rem}
+.fr{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+.h5{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bd);border-radius:8px;padding:4px 10px;color:var(--tx);font-weight:700;background:var(--sf)}
+.h5 svg{width:20px;height:20px}
+footer a{color:var(--ac2);cursor:pointer;text-decoration:underline}
+dialog{background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:14px;max-width:560px;padding:22px}dialog::backdrop{background:#0009}
+dialog pre{white-space:pre-wrap;font:13px/1.55 Consolas,monospace;color:var(--mu);margin:10px 0 16px}
+</style></head><body>
+<div class="w">
+<nav><div class="logo">DS_TRACE <b>LAB</b></div>
+<div class="nb"><a class="btn g" href="#topics">Topics</a><button class="btn g" id="th" aria-label="Toggle theme">☀/☾</button></div></nav>
+
+<section class="hero">
+ <div>
+  <h1>Learn Data Structures in C, <span>line by line</span>.</h1>
+  <p class="sub">Pick a topic, press Next, and watch every C statement change memory. Built for revision, practice and the days you miss class.</p>
+  <div class="term" id="term"></div>
+  <p style="margin-top:16px"><a class="btn" href="#topics">Start learning ↓</a> <button class="btn g" id="rnd">🎲 Surprise me</button></p>
+ </div>
+ <div class="demo">
+  <h4>Try it: a live stack</h4><p>Push and pop. The stack holds 5 items.</p>
+  <div class="stk" id="stk"></div><div class="msg" id="msg"></div>
+  <button class="btn" id="pu">Push</button> <button class="btn g" id="po">Pop</button>
+ </div>
+</section>
+
+<section id="topics">
+ <div class="tools"><input id="q" placeholder="Search topics… (press / )" aria-label="Search"><span id="chips"></span></div>
+ <div class="prog"><div id="pb"></div></div><div class="pt" id="pt"></div>
+ <div class="grid" id="grid"></div>
+</section>
+
+<footer><div class="fr">
+ <div>© 2026 DS_TRACE LAB by Vivek · <a href="https://vivek-22.tech">vivek-22.tech</a><br>Released under the <a id="lic">MIT License</a>.</div>
+ <div class="h5"><svg viewBox="0 0 24 24"><path fill="#e44d26" d="M3 2l1.7 19L12 23l7.3-2L21 2z"/><path fill="#fff" d="M8 7h8.2l-.2 2H10l.2 2h5.6l-.5 5-3.3 1-3.3-1-.2-2.5h2l.1 1.2 1.4.4 1.4-.4.2-1.8H8.3z"/></svg>Powered by HTML5</div>
+</div></footer>
+</div>
+
+<dialog id="dl"><h3 style="margin:0">MIT License</h3>
+<pre>Copyright (c) 2026 Vivek (DS_TRACE LAB, vivek-22.tech)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+<button class="btn" onclick="dl.close()">Close</button></dialog>
+
+<script>
+/* ===== EDIT HERE: set "file" to the exact file name of each of your HTML pages ===== */
+const TOPICS=[
+{g:"STACK",t:"Stack",d:"LIFO list. Push, pop, overflow and underflow traced in C.",file:"C Stack Code Tracer.html"},
+{g:"QUEUE",t:"Linear Queue",d:"FIFO with front and rear. See why freed space is wasted.",file:"Linear Queue Tracer.html"},
+{g:"QUEUE",t:"Circular Queue",d:"Rear wraps around with modulo, so space is reused.",file:"Circular Queue Tracer.html"},
+{g:"SINGLY LINKED LIST",t:"Beginning Insertion & Deletion",d:"Change only head. O(1) insert and delete at the start.",file:"Singly Linked List – Beginning Insertion & Deletion.html"},
+{g:"SINGLY LINKED LIST",t:"End Insertion & Deletion",d:"Traverse to the last node, then link or unlink it.",file:"Singly Linked List – End Insertion & Deletion.html"},
+{g:"SINGLY LINKED LIST",t:"Insertion & Deletion at Position",d:"Insert or delete at any position by rewiring next pointers.",file:"Singly Linked List – Insertion & Deletion at Position.html"},
+{g:"DOUBLY LINKED LIST",t:"Beginning Insertion & Deletion",d:"Handle both next and prev pointers at the head.",file:"Doubly Linked List – Beginning Insertion & Deletion.html"},
+{g:"DOUBLY LINKED LIST",t:"End Insertion & Deletion",d:"Use the tail side with prev and next links.",file:"Doubly Linked List – End Insertion & Deletion.html"},
+{g:"DOUBLY LINKED LIST",t:"Insertion & Deletion at Position",d:"Update four links safely when working in the middle.",file:"Doubly Linked List – Insertion & Deletion at Position.html"}
+];
+/* ================================================================================== */
+const $=s=>document.querySelector(s);let grp="ALL",done={};
+try{done=JSON.parse(localStorage.getItem("dstl")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("dstl",JSON.stringify(done))}catch(e){}};
+const groups=["ALL",...new Set(TOPICS.map(x=>x.g))];
+$("#chips").innerHTML=groups.map(g=>`<button class="chip${g=="ALL"?" on":""}" data-g="${g}">${g=="ALL"?"All":g[0]+g.slice(1).toLowerCase()}</button>`).join(" ");
+$("#chips").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;grp=b.dataset.g;document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c==b));draw()};
+$("#q").oninput=draw;
+function draw(){
+ const s=$("#q").value.toLowerCase();
+ const L=TOPICS.map((x,i)=>({...x,i})).filter(x=>(grp=="ALL"||x.g==grp)&&(x.t+x.g+x.d).toLowerCase().includes(s));
+ $("#grid").innerHTML=L.length?L.map(x=>`<div class="card${done[x.i]?" done":""}"><span class="g">${x.g}</span><h3>${x.t}</h3><p>${x.d}</p><div class="row"><a class="btn" href="${encodeURI(x.file)}">Open tracer →</a><label><input type="checkbox" data-i="${x.i}" ${done[x.i]?"checked":""}> Studied</label></div></div>`).join(""):'<div class="empty">No topic found. Try another word.</div>';
+ requestAnimationFrame(()=>document.querySelectorAll(".card").forEach((c,n)=>setTimeout(()=>c.classList.add("in"),n*60)));
+ const n=Object.values(done).filter(Boolean).length;
+ $("#pb").style.width=n/TOPICS.length*100+"%";$("#pt").textContent=n+" of "+TOPICS.length+" topics studied"+(n==TOPICS.length?" 🎉 All done!":"");
+}
+$("#grid").onchange=e=>{const i=e.target.dataset.i;if(i!==undefined){done[i]=e.target.checked;save();draw()}};
+$("#rnd").onclick=()=>{const t=TOPICS[Math.floor(Math.random()*TOPICS.length)];location.href=encodeURI(t.file)};
+document.addEventListener("keydown",e=>{if(e.key=="/"&&document.activeElement.tagName!="INPUT"){e.preventDefault();$("#q").focus();$("#topics").scrollIntoView()}});
+/* theme */
+const root=document.documentElement;try{const t=localStorage.getItem("dstl-th");if(t)root.dataset.theme=t}catch(e){}
+$("#th").onclick=()=>{const t=root.dataset.theme=="light"?"dark":"light";root.dataset.theme=t;try{localStorage.setItem("dstl-th",t)}catch(e){}};
+$("#lic").onclick=()=>$("#dl").showModal();
+/* typing hero */
+const code=['<span class="k">void</span> push(int x){','  if(top == MAX-1) printf("Overflow");','  else s[++top] = x;','}'];
+let ln=0,ch=0;const term=$("#term");
+function type(){
+ const done_=code.slice(0,ln).join("\n");const cur=code[ln]||"";
+ const plain=cur.replace(/<[^>]+>/g,"");
+ if(ln>=code.length){setTimeout(()=>{ln=0;ch=0;type()},2200);return}
+ let shown=cur,vis=0,out="",tag=false;
+ for(const c of cur){if(c=="<")tag=true;out+=c;if(c==">")tag=false;if(!tag&&c!=">"){vis++;if(vis>=ch)break}}
+ term.innerHTML=(done_?done_+"\n":"")+out+'<span class="cur"></span>';
+ ch++;if(ch>plain.length+1){ln++;ch=0}
+ setTimeout(type,45);
+}
+type();
+/* live stack demo */
+let st=[];const MAX=5;
+function rs(){$("#stk").innerHTML=st.map((v,i)=>`<div class="it${i==st.length-1?" top":""}">${v}${i==st.length-1?" ← top":""}</div>`).join("")}
+function say(m){const e=$("#msg");e.textContent=m;e.classList.remove("shake");void e.offsetWidth;e.classList.add("shake")}
+$("#pu").onclick=()=>{if(st.length==MAX)return say("Overflow! top == MAX-1");st.push(Math.floor(Math.random()*90)+10);say("push → top = "+(st.length-1));rs()};
+$("#po").onclick=()=>{if(!st.length)return say("Underflow! top == -1");const v=st.pop();say("pop returned "+v+", top = "+(st.length-1));rs()};
+draw();rs();
+</script></body></html>

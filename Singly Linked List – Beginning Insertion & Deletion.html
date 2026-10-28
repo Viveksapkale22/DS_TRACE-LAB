@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Singly Linked List – Beginning Insertion & Deletion</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7f9;--fg:#1c2230;--mut:#6b7385;--card:#fff;--bd:#dde1ea;--acc:#2f6fed;--cur:#fff3bf;--fn:#eef3ff;--ok:#1f9d55;--code:#fbfbfd}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--fg:#e6e9f0;--mut:#98a1b5;--card:#1b2030;--bd:#2d3447;--acc:#6b9cff;--cur:#4a4120;--fn:#1d2740;--ok:#4cc38a;--code:#171b27}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:14px}
+h1{font-size:19px;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:12px;max-width:1200px;margin:auto}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px}
+#code{font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--code);max-height:62vh;overflow:auto;border-radius:8px;border:1px solid var(--bd)}
+.ln{display:flex;white-space:pre;padding:0 8px}.ln i{width:30px;flex:none;color:var(--mut);font-style:normal;user-select:none}
+.ln.fn{background:var(--fn)}.ln.cur{background:var(--cur);box-shadow:inset 3px 0 var(--acc);font-weight:600}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 0}
+button{font:inherit;padding:6px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}button:disabled{opacity:.4;cursor:default}
+#cnt{color:var(--mut);font-size:13px;margin-left:auto}
+#msg{margin:0 0 6px}#op{font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--ok);margin:0;min-height:20px}
+.col{display:flex;flex-direction:column;gap:12px}
+.vars{font:12px ui-monospace,monospace;margin-bottom:8px;color:var(--mut)}
+.row{display:flex;flex-wrap:wrap;row-gap:10px;align-items:flex-start}
+.nd{display:flex;flex-direction:column;align-items:center}.tg{min-height:18px;font:600 11px ui-monospace,monospace;color:var(--acc)}
+.bx{display:flex;border:1px solid var(--acc);border-radius:6px;background:var(--fn);font:600 13px ui-monospace,monospace}
+.bx span{padding:6px 10px}.bx .nx{border-left:1px solid var(--acc);color:var(--mut);font-size:11px;display:flex;align-items:center}
+.bx.hi{background:var(--cur);border-color:#e0a800}.bx.fr{opacity:.5;text-decoration:line-through;border-style:dashed}
+.bx.nl{border-color:var(--bd);color:var(--mut);background:none;padding:6px 10px}
+.ad{font:10px ui-monospace,monospace;color:var(--mut)}.ar{color:var(--mut);padding:24px 5px 0}
+.sub{font-size:12px;color:var(--mut);margin:10px 0 4px}
+#fr div{font:13px ui-monospace,monospace;padding:3px 8px;border:1px solid var(--bd);border-radius:6px;margin-bottom:3px}
+#fr div:first-child{background:var(--fn);border-color:var(--acc)}
+#out{margin:0;font:13px ui-monospace,monospace;min-height:48px;white-space:pre-wrap;background:#0d1117;color:#7ee787;padding:8px;border-radius:8px}
+</style></head><body>
+<h1>Singly Linked List – Beginning Insertion & Deletion — Line-by-Line Tracer</h1>
+<div class="grid">
+ <div class="col"><div class="card"><h2>Source code <span id="where" style="text-transform:none;letter-spacing:0"></span></h2><div id="code"></div>
+  <div class="ctrl"><button id="pv">◀ Back</button><button id="nx" class="p">Next ▶</button><button id="au">Auto play</button><button id="rs">Reset</button><span id="cnt"></span></div>
+  <input id="sl" type="range" min="0" value="0" style="width:100%;margin-top:8px"></div></div>
+ <div class="col">
+  <div class="card"><h2>What happens on this line</h2><p id="msg"></p><p id="op"></p></div>
+  <div class="card"><h2>Linked list in heap memory</h2><div class="vars" id="vars"></div><div class="row" id="chain"></div><div id="extra"></div></div>
+  <div class="card"><h2>Call stack (top = running function)</h2><div id="fr"></div></div>
+  <div class="card"><h2>Console output</h2><pre id="out"></pre></div>
+ </div></div>
+<script>
+const SRC=["#include <stdio.h>", "#include <stdlib.h>", "", "struct node {", "    int data;", "    struct node *next;", "};", "", "struct node *head = NULL;", "", "void insertAtBeginning(int new_val) {", "    struct node *new_node = (struct node*)malloc(sizeof(struct node));", "    if (new_node == NULL) {", "        printf(\"Memory allocation failed!\\n\");", "        return;", "    }", "    new_node->data = new_val;", "    new_node->next = head;", "    head = new_node;", "}", "", "void deleteAtBeginning() {", "    if (head == NULL) {", "        printf(\"List is empty!\\n\");", "        return;", "    }", "    struct node *temp = head;", "    head = head->next;", "    free(temp);", "}", "", "void printList() {", "    struct node *temp = head;", "    while (temp != NULL) {", "        printf(\"%d -> \", temp->data);", "        temp = temp->next;", "    }", "    printf(\"NULL\\n\");", "}", "", "int main() {", "    // Phase 1: insert at the beginning", "    insertAtBeginning(5);", "    insertAtBeginning(1);", "    insertAtBeginning(9);", "    printList();", "", "    // Phase 2: delete from the beginning until empty", "    deleteAtBeginning();", "    printList();", "    deleteAtBeginning();", "    deleteAtBeginning();", "    deleteAtBeginning();", "    printList();", "    return 0;", "}"],R={"insertAtBeginning": [11, 20], "deleteAtBeginning": [22, 30], "printList": [32, 39], "main": [41, 56]};
+let H={},P={head:null},nid=0,out='',steps=[],fr=['main()'];
+const A=id=>id==null?'NULL':id==='?'?'?':'0x'+(0x5a10+id*0x20).toString(16);
+const S=(line,msg,op='',hi=null)=>steps.push({line,msg,op,hi,H:JSON.parse(JSON.stringify(H)),P:{...P},out,fr:fr.slice()});
+const malloc=()=>{const id=nid++;H[id]={data:'?',next:'?',freed:false};return id};
+const fs=f=>SRC.findIndex(l=>/^(void|int)\s+\w+\(/.test(l)&&l.includes(f+'('));
+const hd=f=>fs(f)+1,endl=f=>SRC.findIndex((l,i)=>i>fs(f)&&l==='}')+1;
+const at=(f,t,n=0)=>{let c=0;for(let i=fs(f)+1;i<SRC.length;i++)if(SRC[i].includes(t)&&c++===n)return i+1;throw Error('line not found: '+f+' / '+t)};
+function printList(cl){const L=(t,n)=>at('printList',t,n);S(cl,'main calls printList().');fr.unshift('printList()');
+ S(hd('printList'),'Inside printList: it only reads the list, it never changes it.');
+ P.temp=P.head;S(L('temp = head'),`Create a traversal pointer temp and start it at head (${A(P.head)}).`,`temp = ${A(P.temp)}`,P.temp);
+ for(;;){const c=P.temp!=null;S(L('while'),`Loop check: temp != NULL → ${A(P.temp)} != NULL → ${c?'TRUE':'FALSE, the loop ends'}.`,'',P.temp);if(!c)break;
+  out+=`${H[P.temp].data} -> `;S(L('printf("%d'),'Print this node’s data.',`prints ${H[P.temp].data} ->`,P.temp);
+  P.temp=H[P.temp].next;S(L('temp = temp->next'),`Move to the next node: temp = temp->next → ${A(P.temp)}${P.temp==null?' (NULL = end of list)':''}.`,`temp = ${A(P.temp)}`,P.temp)}
+ out+='NULL\n';S(L('"NULL'),'Print NULL to mark the end of the list.');delete P.temp;S(endl('printList'),'End of printList() → return to main().');fr.shift()}
+function runMain(FN){const M0=SRC.findIndex(l=>l.startsWith('int main'));S(M0+1,'Program starts: the OS calls main(). The global pointer head is NULL, so the list is empty.');
+ for(let k=M0+1;k<SRC.length;k++){const t=SRC[k].trim(),ln=k+1;if(!t)continue;
+  if(t.startsWith('//'))S(ln,'▶ '+t.slice(2).trim()+'.');
+  else if(t.startsWith('return 0'))S(ln,'return 0 → program finished successfully.','return 0');
+  else if(t==='}'&&k===SRC.length-1)S(ln,'End of main().');
+  else{const m=t.match(/^(\w+)\(([^)]*)\);/);if(m)FN[m[1]](...(m[2]?m[2].split(',').map(Number):[]),ln)}}}
+function insertAtBeginning(v,cl){const f='insertAtBeginning',L=(t,n)=>at(f,t,n);
+ S(cl,`main calls insertAtBeginning(${v}). Control jumps into the function.`,`new_val = ${v}`);fr.unshift(`insertAtBeginning(${v})`);
+ S(hd(f),`Inside the function: new_val = ${v}. head currently holds ${A(P.head)}.`);
+ const n=malloc();P.new_node=n;S(L('malloc'),`malloc reserves memory on the HEAP for one node. new_node points to the new block at ${A(n)}; its data and next hold garbage for now.`,`new_node = ${A(n)}`,n);
+ S(L('new_node == NULL'),'Check whether malloc failed: new_node == NULL is FALSE, so we continue.');
+ H[n].data=v;S(L('new_node->data'),'Store the value in the node.',`new_node->data = ${v}`,n);
+ H[n].next=P.head;S(L('new_node->next'),`Link the new node to the current first node: new_node->next = head → ${A(P.head)}. The new node now points to the old list.`,`new_node->next = ${A(P.head)}`,n);
+ P.head=n;S(L('head = new_node'),'Move head to the new node, so it becomes the first node. Link first, then move head: that order never loses the old list.',`head = ${A(n)}`,n);
+ delete P.new_node;S(endl(f),'End of function: the local pointer new_node disappears, but the node itself stays alive on the heap. Back to main().');fr.shift()}
+function deleteAtBeginning(cl){const f='deleteAtBeginning',L=(t,n)=>at(f,t,n);S(cl,'main calls deleteAtBeginning().');fr.unshift('deleteAtBeginning()');S(hd(f),'Inside deleteAtBeginning.');
+ const e=P.head==null;S(L('head == NULL'),`Is the list empty? head == NULL → ${A(P.head)} == NULL → ${e?'TRUE':'FALSE'}.`);
+ if(e){out+='List is empty!\n';S(L('printf'),'Nothing to delete: print the message.');S(L('return'),'return early.');fr.shift();return}
+ P.temp=P.head;S(L('temp = head'),'Save the first node in temp. Without this we would lose its address after moving head, and could never free it.',`temp = ${A(P.temp)}`,P.temp);
+ P.head=H[P.temp].next;S(L('head = head->next'),`Move head to the second node: head = head->next → ${A(P.head)}. The old first node is now cut off from the list.`,`head = ${A(P.head)}`,P.temp);
+ H[P.temp].freed=true;S(L('free(temp)'),'free(temp) gives the old first node’s memory back to the system.',`free(${A(P.temp)})`,P.temp);
+ delete P.temp;S(endl(f),'End of function: the local pointer temp disappears. Back to main().');fr.shift()}
+runMain({insertAtBeginning,deleteAtBeginning,printList});
+
+const $=id=>document.getElementById(id);let i=0,timer=null;
+$('code').innerHTML=SRC.map((t,k)=>`<div class="ln" id="l${k+1}"><i>${k+1}</i><span></span></div>`).join('');
+$('code').querySelectorAll('.ln span').forEach((s,k)=>s.textContent=SRC[k]);$('sl').max=steps.length-1;
+function render(){const s=steps[i],name=s.fr[0].split('(')[0],[a,b]=R[name];
+ for(let k=1;k<=SRC.length;k++)$('l'+k).className='ln'+(k>=a&&k<=b?' fn':'')+(k===s.line?' cur':'');
+ $('l'+s.line).scrollIntoView({block:'nearest'});
+ $('where').textContent='— inside '+name+'()';$('msg').textContent=s.msg;$('op').textContent=s.op?'⚙ '+s.op:'';
+ $('vars').textContent='Pointers:  '+Object.entries(s.P).map(([k,v])=>`${k} = ${A(v)}`).join('   ');
+ const tags={},nt=[];for(const[k,v]of Object.entries(s.P)){if(v==null)nt.push(k);else(tags[v]=tags[v]||[]).push(k)}
+ const nd=id=>{const n=s.H[id];return `<div class="nd"><div class="tg">${(tags[id]||[]).join(', ')}</div><div class="bx${n.freed?' fr':''}${s.hi===id?' hi':''}"><span>${n.data}</span><span class="nx">${A(n.next)}</span></div><div class="ad">${A(+id)}${n.freed?' freed':''}</div></div>`};
+ const chain=[],seen=new Set();let c=s.P.head;while(c!=null&&c!=='?'&&!seen.has(c)){seen.add(c);chain.push(c);c=s.H[c].next}
+ $('chain').innerHTML=chain.map(id=>nd(id)+'<div class="ar">→</div>').join('')+`<div class="nd"><div class="tg">${nt.join(', ')}</div><div class="bx nl">NULL</div></div>`;
+ const ids=Object.keys(s.H).map(Number),orph=ids.filter(x=>!seen.has(x)&&!s.H[x].freed),fre=ids.filter(x=>!seen.has(x)&&s.H[x].freed);
+ $('extra').innerHTML=(orph.length?`<div class="sub">Allocated but NOT linked into the list yet</div><div class="row">${orph.map(nd).join('')}</div>`:'')+(fre.length?`<div class="sub">Freed memory (returned to the system)</div><div class="row">${fre.map(nd).join('')}</div>`:'');
+ $('fr').innerHTML=s.fr.map(f=>`<div>${f}</div>`).join('');$('out').textContent=s.out||' ';
+ $('cnt').textContent=`Step ${i+1} / ${steps.length}`;$('sl').value=i;$('pv').disabled=i===0;$('nx').disabled=i===steps.length-1;if(i===steps.length-1)stop()}
+function go(n){i=Math.max(0,Math.min(steps.length-1,n));render()}
+function stop(){clearInterval(timer);timer=null;$('au').textContent='Auto play'}
+$('nx').onclick=()=>go(i+1);$('pv').onclick=()=>go(i-1);$('rs').onclick=()=>{stop();go(0)};$('sl').oninput=e=>go(+e.target.value);
+$('au').onclick=()=>{if(timer){stop();return}if(i===steps.length-1)go(0);$('au').textContent='Pause';timer=setInterval(()=>go(i+1),1100)};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+render();
+</script></body></html>
