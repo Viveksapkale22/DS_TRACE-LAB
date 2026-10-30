@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DS_TRACE LAB – C Fundamentals Chapter</title>
+<style>
+:root{--bg:#f3f5f2;--panel:#fff;--ink:#17211b;--mute:#5d6b62;--line:#d5dcd6;--acc:#0f7a55;--accsoft:#dff3ea;--hl:#fff1b8;--con:#0e1512;--conink:#b8f5d3;--inp:#ffd479;--code:#f7f9f7}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1310;--panel:#151d18;--ink:#e6efe9;--mute:#93a39a;--line:#26332b;--acc:#3ddc97;--accsoft:#173326;--hl:#4a4217;--con:#070b09;--conink:#9ff0c4;--inp:#ffd479;--code:#101712}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 Georgia,'Times New Roman',serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.mono,code,pre,.code,.console,.vars{font-family:'Cascadia Code',Consolas,Menlo,monospace}
+header{padding:22px 20px 14px;max-width:1100px;margin:0 auto}
+.brand{font:700 15px 'Cascadia Code',Consolas,monospace;color:var(--acc)}
+h1{margin:4px 0 2px;font-size:clamp(26px,5vw,40px);line-height:1.15}
+.sub{color:var(--mute);margin:0}
+main{max-width:1100px;margin:0 auto;padding:0 20px 40px}
+.chapters{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--mute);padding:5px 12px;border-radius:99px;font-size:13px}
+.chip.on{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:700}
+.list{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.list button{width:46px;height:46px;border-radius:10px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:700 17px 'Cascadia Code',Consolas,monospace;cursor:pointer}
+.list button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+h2{margin:0 0 6px;font-size:22px}h3{margin:0 0 6px;font-size:16px;color:var(--acc)}
+.card p{margin:4px 0}
+.grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.code{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:8px 0;font-size:13.5px;overflow-x:auto}
+.ln{display:flex;white-space:pre;padding:0 12px;border-left:4px solid transparent}
+.ln i{color:var(--mute);width:28px;flex:none;font-style:normal;user-select:none}
+.ln.on{background:var(--hl);border-left-color:var(--acc)}
+.console{background:var(--con);color:var(--conink);border-radius:8px;padding:12px;min-height:130px;font-size:14px;white-space:pre-wrap;overflow-x:auto}
+.console .in{color:var(--inp);font-weight:700}
+.cur{display:inline-block;width:8px;height:15px;background:var(--conink);vertical-align:-2px}
+@media(prefers-reduced-motion:no-preference){.cur{animation:b 1s steps(2) infinite}@keyframes b{50%{opacity:0}}}
+.vars{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;min-height:30px}
+.vars span{background:var(--accsoft);border-radius:6px;padding:2px 9px;font-size:13px}
+.what{background:var(--accsoft);border-radius:8px;padding:10px 12px;margin-top:8px;min-height:62px}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.ctrl button{padding:9px 16px;border-radius:8px;border:1px solid var(--acc);background:var(--panel);color:var(--acc);font:700 14px Georgia,serif;cursor:pointer}
+.ctrl button.p{background:var(--acc);color:#fff}
+.ctrl button:disabled{opacity:.4;cursor:not-allowed}
+.ctrl select,.inputs input{padding:7px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:14px 'Cascadia Code',Consolas,monospace}
+.inputs{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:6px}
+.inputs label{font-size:13px;color:var(--mute);display:flex;flex-direction:column;gap:2px}
+.inputs input{width:100px}
+.bar{height:6px;background:var(--line);border-radius:4px;margin-top:10px;overflow:hidden}
+.bar div{height:100%;background:var(--acc);width:0;transition:width .2s}
+.note{font-size:13px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">DS_TRACE LAB</div>
+  <h1>Chapter: C Fundamentals Experiments</h1>
+  <p class="sub">Pick an experiment, change the inputs, then step through the code line by line and watch the console.</p>
+</header>
+<main>
+  <div class="chapters" aria-label="Chapters"><span class="chip on">C Fundamentals (new)</span></div>
+  <div class="list" id="list" role="tablist" aria-label="Experiment list"></div>
+  <section class="card"><h2 id="title"></h2><p id="aim"></p></section>
+  <section class="card"><h3>Basic concept</h3><div id="concept"></div></section>
+  <section class="card">
+    <div class="inputs" id="inputs"></div>
+    <div class="grid">
+      <div><h3>Code</h3><div class="code" id="code"></div></div>
+      <div><h3>Console output</h3><div class="console" id="con" aria-live="polite"></div>
+        <div class="vars" id="vars"></div></div>
+    </div>
+    <div class="what"><b>What happened:</b> <span id="msg"></span></div>
+    <div class="bar"><div id="prog"></div></div>
+    <div class="ctrl">
+      <button id="back">Back</button>
+      <button id="next" class="p">Next</button>
+      <button id="auto">Auto play</button>
+      <button id="reset">Reset</button>
+      <label class="note">Speed <select id="spd"><option value="1800">Slow</option><option value="1100" selected>Normal</option><option value="500">Fast</option></select></label>
+      <span class="note" id="cnt"></span>
+    </div>
+  </section>
+  <p class="note">Programs use standard C (<span class="mono">#include &lt;stdio.h&gt;</span>). Output is simulated step by step in the browser.</p>
+</main>
+<script>
+const H='#include <stdio.h>',M='int main() {';
+const inp=v=>'<b class="in">'+v+'</b>\n';
+function B(){const st=[],v={};return{v,add(ln,msg,out,set){Object.assign(v,set||{});st.push({ln,msg,out:out||'',v:{...v}})},st}}
+const I=(id,l,d)=>({id,l,d});
+const EX=[
+{t:'Experiment 1: Sum, difference, product and division of two numbers',
+aim:'Aim: Write a program to accept two numbers and print their sum, difference, multiplication and division.',
+concept:'<p><b>Variables</b> store data in memory. <code>int</code> holds whole numbers. <code>scanf</code> reads input from the keyboard and needs the address (<code>&amp;</code>) of each variable. Arithmetic operators are <code>+ - * /</code>.</p><p>Dividing two <code>int</code> values drops the decimal part (7/2 = 3), so we cast one value to <code>float</code> to get 3.50.</p>',
+code:[H,M,'    int num1, num2, sum, difference, product;','    float quotient;','    printf("Enter two numbers: ");','    scanf("%d %d", &num1, &num2);','    sum = num1 + num2;','    difference = num1 - num2;','    product = num1 * num2;','    quotient = (float)num1 / num2;','    printf("Sum = %d\\n", sum);','    printf("Difference = %d\\n", difference);','    printf("Product = %d\\n", product);','    printf("Division = %.2f\\n", quotient);','    return 0;','}'],
+inputs:[I('a','First number',12),I('b','Second number',5)],
+run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0,s=B();
+s.add(2,'Memory is reserved for four int variables.');s.add(3,'A float variable is reserved for the division result.');
+s.add(4,'The prompt is printed on the console.','Enter two numbers: ');
+s.add(5,'scanf reads '+a+' and '+b+' and stores them.',inp(a+' '+b),{num1:a,num2:b});
+s.add(6,'sum = '+a+' + '+b+' = '+(a+b),'',{sum:a+b});
+s.add(7,'difference = '+a+' - '+b+' = '+(a-b),'',{difference:a-b});
+s.add(8,'product = '+a+' * '+b+' = '+(a*b),'',{product:a*b});
+if(b===0)s.add(9,'Dividing by zero is undefined in C, so the result is not a valid number (inf). Try a non-zero second number.','',{quotient:'inf'});
+else{const q=(a/b);s.add(9,'(float)'+a+' is converted first, so the division keeps decimals: '+q.toFixed(2),'',{quotient:q.toFixed(2)});}
+s.add(10,'Prints the sum.','Sum = '+(a+b)+'\n');s.add(11,'Prints the difference.','Difference = '+(a-b)+'\n');s.add(12,'Prints the product.','Product = '+(a*b)+'\n');
+s.add(13,'Prints the division with 2 decimal places.','Division = '+(b===0?'inf':(a/b).toFixed(2))+'\n');
+s.add(14,'main returns 0: the program ended successfully.');return s.st}},
+{t:'Experiment 2: Simple Interest',
+aim:'Aim: Write a program to calculate Simple Interest (SI) by taking input from the user.',
+concept:'<p><b>Simple Interest</b> is interest earned only on the original amount: <code>SI = (P × R × T) / 100</code> where P = principal, R = rate per year (%), T = time in years.</p><p>Money values can have decimals, so we use <code>float</code> and read it with <code>%f</code>. <code>%.2f</code> prints two decimal places.</p>',
+code:[H,M,'    float P, R, T, SI;','    printf("Enter Principal amount: ");','    scanf("%f", &P);','    printf("Enter Rate of interest: ");','    scanf("%f", &R);','    printf("Enter Time (in years): ");','    scanf("%f", &T);','    SI = (P * R * T) / 100;','    printf("Simple Interest = %.2f\\n", SI);','    return 0;','}'],
+inputs:[I('p','Principal',10000),I('r','Rate %',5),I('t','Years',3)],
+run(x){const P=parseFloat(x.p)||0,R=parseFloat(x.r)||0,T=parseFloat(x.t)||0,s=B(),SI=P*R*T/100;
+s.add(2,'Four float variables are declared.');
+s.add(3,'Asks for the principal.','Enter Principal amount: ');s.add(4,'P = '+P,inp(P),{P});
+s.add(5,'Asks for the rate.','Enter Rate of interest: ');s.add(6,'R = '+R,inp(R),{R});
+s.add(7,'Asks for the time.','Enter Time (in years): ');s.add(8,'T = '+T,inp(T),{T});
+s.add(9,'SI = ('+P+' × '+R+' × '+T+') / 100 = '+SI.toFixed(2),'',{SI:SI.toFixed(2)});
+s.add(10,'Prints the interest to 2 decimals.','Simple Interest = '+SI.toFixed(2)+'\n');s.add(11,'Program ends.');return s.st}},
+{t:'Experiment 3: Smallest and largest of three numbers (ternary operator)',
+aim:'Aim: Find the smallest and largest of three integers using the conditional (ternary) operator.',
+concept:'<p>The <b>ternary operator</b> <code>condition ? value1 : value2</code> is a short if-else that returns a value. If the condition is true you get value1, otherwise value2.</p><p>Nesting ternaries lets us compare three numbers in a single expression.</p>',
+code:[H,M,'    int a, b, c, largest, smallest;','    printf("Enter three numbers: ");','    scanf("%d %d %d", &a, &b, &c);','    largest = (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);','    smallest = (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);','    printf("Largest number = %d\\n", largest);','    printf("Smallest number = %d\\n", smallest);','    return 0;','}'],
+inputs:[I('a','a',14),I('b','b',27),I('c','c',9)],
+run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0,c=parseInt(x.c)||0,s=B();
+const L=Math.max(a,b,c),S=Math.min(a,b,c);
+s.add(2,'Five int variables are declared.');s.add(3,'Asks for three numbers.','Enter three numbers: ');
+s.add(4,'a, b and c are stored.',inp(a+' '+b+' '+c),{a,b,c});
+s.add(5,a>b?'a > b is true, so compare a with c: the larger one is '+L:'a > b is false, so compare b with c: the larger one is '+L,'',{largest:L});
+s.add(6,a<b?'a < b is true, so compare a with c: the smaller one is '+S:'a < b is false, so compare b with c: the smaller one is '+S,'',{smallest:S});
+s.add(7,'Prints the largest.','Largest number = '+L+'\n');s.add(8,'Prints the smallest.','Smallest number = '+S+'\n');s.add(9,'Program ends.');return s.st}},
+{t:'Experiment 4: First n natural numbers (do-while loop)',
+aim:'Aim: Display the first n natural numbers using a do-while loop.',
+concept:'<p>Natural numbers are 1, 2, 3, ... A <b>do-while</b> loop is an <i>exit-controlled</i> loop: the body runs first and the condition is checked afterwards, so the body always runs at least once.</p><p>Syntax: <code>do { body } while (condition);</code> (note the semicolon at the end).</p>',
+code:[H,M,'    int i = 1, n;','    printf("Enter the value of n: ");','    scanf("%d", &n);','    do {','        printf("%d\\n", i);','        i++;','    } while (i <= n);','    return 0;','}'],
+inputs:[I('n','n (max 15)',5)],
+run(x){let n=Math.min(15,parseInt(x.n)||1),s=B(),i=1;
+s.add(2,'i starts at 1. n is not set yet.','',{i:1});s.add(3,'Asks for n.','Enter the value of n: ');s.add(4,'n = '+n,inp(n),{n});
+do{s.add(5,'Enter the loop body (no condition check yet).');s.add(6,'Prints i = '+i,i+'\n');i++;s.add(7,'i is incremented to '+i,'',{i});
+s.add(8,'Check: '+i+' <= '+n+' is '+(i<=n)+(i<=n?', so repeat.':', so the loop stops.'));}while(i<=n);
+s.add(9,'Program ends.');return s.st}},
+{t:'Experiment 5: Sum and product of digits (while loop)',
+aim:'Aim: Find the sum and product of all digits of a number using a while loop.',
+concept:'<p>A <b>while</b> loop checks its condition <i>before</i> every pass. To split a number into digits: <code>num % 10</code> gives the last digit and <code>num / 10</code> removes it (integer division).</p><p>We keep adding digits to <code>sum</code> and multiplying into <code>product</code> (which must start at 1, not 0).</p>',
+code:[H,M,'    int num, digit, sum = 0, product = 1;','    printf("Enter a number: ");','    scanf("%d", &num);','    while (num > 0) {','        digit = num % 10;','        sum = sum + digit;','        product = product * digit;','        num = num / 10;','    }','    printf("Sum of digits = %d\\n", sum);','    printf("Product of digits = %d\\n", product);','    return 0;','}'],
+inputs:[I('n','Number (positive)',2345)],
+run(x){let n=Math.min(999999999,Math.abs(parseInt(x.n)||0)),o=n,s=B(),sum=0,pr=1;
+s.add(2,'sum starts at 0 and product at 1.','',{sum:0,product:1});s.add(3,'Asks for a number.','Enter a number: ');s.add(4,'num = '+n,inp(n),{num:n});
+while(n>0){s.add(5,'Check: '+n+' > 0 is true, enter the loop.');const d=n%10;s.add(6,n+' % 10 = '+d+' (last digit)','',{digit:d});
+sum+=d;s.add(7,'sum = '+(sum-d)+' + '+d+' = '+sum,'',{sum});pr*=d;s.add(8,'product = '+(pr/(d||1))+' × '+d+' = '+pr,'',{product:pr});
+n=Math.floor(n/10);s.add(9,'num = num / 10 = '+n,'',{num:n});}
+s.add(5,'Check: num > 0 is false, the loop ends.');
+s.add(11,'Prints the sum.','Sum of digits = '+sum+'\n');s.add(12,'Prints the product.','Product of digits = '+pr+'\n');s.add(13,'Program ends.');return s.st}},
+{t:'Experiment 6: Largest of three numbers (nested if-else)',
+aim:'Aim: Find the largest of three numbers using nested if-else statements.',
+concept:'<p><b>if-else</b> chooses between two paths based on a condition. A <b>nested</b> if-else places one if-else inside another so we can make a second decision after the first.</p><p>Here the outer if finds the bigger of a and b, and the inner if compares that winner with c.</p>',
+code:[H,M,'    int a, b, c;','    printf("Enter three numbers: ");','    scanf("%d %d %d", &a, &b, &c);','    if (a > b) {','        if (a > c) printf("Largest number = %d\\n", a);','        else printf("Largest number = %d\\n", c);','    } else {','        if (b > c) printf("Largest number = %d\\n", b);','        else printf("Largest number = %d\\n", c);','    }','    return 0;','}'],
+inputs:[I('a','a',8),I('b','b',21),I('c','c',15)],
+run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0,c=parseInt(x.c)||0,s=B();
+s.add(2,'Three int variables are declared.');s.add(3,'Asks for three numbers.','Enter three numbers: ');s.add(4,'Values are stored.',inp(a+' '+b+' '+c),{a,b,c});
+if(a>b){s.add(5,'a > b ('+a+' > '+b+') is true, take the outer if branch.');
+if(a>c)s.add(6,'a > c is true, so a is the largest.','Largest number = '+a+'\n');else s.add(6,'a > c is false, so the else prints c.','Largest number = '+c+'\n');}
+else{s.add(5,'a > b ('+a+' > '+b+') is false, take the outer else branch.');s.add(8,'Now compare b with c.');
+if(b>c)s.add(9,'b > c is true, so b is the largest.','Largest number = '+b+'\n');else s.add(10,'b > c is false, so c is the largest.','Largest number = '+c+'\n');}
+s.add(12,'Program ends.');return s.st}}
+];
+let cur=0,steps=[],k=-1,timer=null;
+const $=id=>document.getElementById(id);
+function stop(){clearInterval(timer);timer=null;$('auto').textContent='Auto play'}
+function build(){
+ const e=EX[cur];$('title').textContent=e.t;$('aim').textContent=e.aim;$('concept').innerHTML=e.concept;
+ $('inputs').innerHTML=e.inputs.map(f=>'<label>'+f.l+'<input type="number" id="in_'+f.id+'" value="'+f.d+'"></label>').join('');
+ e.inputs.forEach(f=>$('in_'+f.id).addEventListener('change',()=>{stop();load()}));
+ $('code').innerHTML=e.code.map((l,i)=>'<div class="ln" id="l'+i+'"><i>'+(i+1)+'</i><span></span></div>').join('');
+ e.code.forEach((l,i)=>document.querySelector('#l'+i+' span').textContent=l);
+ load()}
+function load(){const e=EX[cur],x={};e.inputs.forEach(f=>x[f.id]=$('in_'+f.id).value);steps=e.run(x);k=-1;draw()}
+function draw(){
+ document.querySelectorAll('.ln').forEach(n=>n.classList.remove('on'));
+ let out='';for(let i=0;i<=k;i++)out+=steps[i].out;
+ $('con').innerHTML=out+'<span class="cur"></span>';
+ if(k<0){$('msg').textContent='Press Next or Auto play to start running the program.';$('vars').innerHTML='';}
+ else{const s=steps[k];$('l'+s.ln).classList.add('on');$('l'+s.ln).scrollIntoView({block:'nearest'});$('msg').textContent=s.msg;
+  $('vars').innerHTML=Object.entries(s.v).map(([a,b])=>'<span>'+a+' = '+b+'</span>').join('')}
+ $('prog').style.width=((k+1)/steps.length*100)+'%';$('cnt').textContent='Step '+(k+1)+' / '+steps.length;
+ $('back').disabled=k<0;$('next').disabled=k>=steps.length-1;
+ if(k>=steps.length-1&&timer)stop()}
+function next(){if(k<steps.length-1){k++;draw()}}
+$('next').onclick=()=>{stop();next()};
+$('back').onclick=()=>{stop();if(k>-1){k--;draw()}};
+$('reset').onclick=()=>{stop();k=-1;draw()};
+$('auto').onclick=()=>{if(timer){stop();return}if(k>=steps.length-1)k=-1;$('auto').textContent='Pause';next();timer=setInterval(next,+$('spd').value)};
+$('spd').onchange=()=>{if(timer){clearInterval(timer);timer=setInterval(next,+$('spd').value)}};
+EX.forEach((e,i)=>{const b=document.createElement('button');b.textContent=i+1;b.title=e.t;b.setAttribute('aria-label','Experiment '+(i+1));
+ b.onclick=()=>{stop();cur=i;document.querySelectorAll('#list button').forEach((x,j)=>x.classList.toggle('on',j===i));build()};$('list').appendChild(b)});
+$('list').firstChild.classList.add('on');build();
+</script>
+</body>
+</html>
