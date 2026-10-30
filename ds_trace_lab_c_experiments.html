@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DS_TRACE LAB – C Fundamentals Chapter</title>
 <style>
 :root{--bg:#f3f5f2;--panel:#fff;--ink:#17211b;--mute:#5d6b62;--line:#d5dcd6;--acc:#0f7a55;--accsoft:#dff3ea;--hl:#fff1b8;--con:#0e1512;--conink:#b8f5d3;--inp:#ffd479;--code:#f7f9f7}
@@ -21,6 +21,7 @@ main{max-width:1100px;margin:0 auto;padding:0 20px 40px}
 .chip.on{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:700}
 .list{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .list button{width:46px;height:46px;border-radius:10px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:700 17px 'Cascadia Code',Consolas,monospace;cursor:pointer}
+.list button.pr{border-style:dashed;font-size:14px}
 .list button.on{background:var(--acc);border-color:var(--acc);color:#fff}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
@@ -56,7 +57,7 @@ h2{margin:0 0 6px;font-size:22px}h3{margin:0 0 6px;font-size:16px;color:var(--ac
 <header>
   <div class="brand">DS_TRACE LAB</div>
   <h1>Chapter: C Fundamentals Experiments</h1>
-  <p class="sub">Pick an experiment, change the inputs, then step through the code line by line and watch the console.</p>
+  <p class="sub">Pick an experiment, change the inputs, then step through the code line by line and watch the console. Buttons 1–7 are experiments; P1–P6 are extra practice.</p>
 </header>
 <main>
   <div class="chapters" aria-label="Chapters"><span class="chip on">C Fundamentals (new)</span></div>
@@ -130,7 +131,25 @@ s.add(4,'a, b and c are stored.',inp(a+' '+b+' '+c),{a,b,c});
 s.add(5,a>b?'a > b is true, so compare a with c: the larger one is '+L:'a > b is false, so compare b with c: the larger one is '+L,'',{largest:L});
 s.add(6,a<b?'a < b is true, so compare a with c: the smaller one is '+S:'a < b is false, so compare b with c: the smaller one is '+S,'',{smallest:S});
 s.add(7,'Prints the largest.','Largest number = '+L+'\n');s.add(8,'Prints the smallest.','Smallest number = '+S+'\n');s.add(9,'Program ends.');return s.st}},
-{t:'Experiment 4: First n natural numbers (do-while loop)',
+{t:'Experiment 4: Number pattern using nested for loops',
+aim:'Aim: To write a program to display the following pattern by asking the user for the number of lines.  1 / 12 / 123 / 1234 ...',
+concept:'<p>A <b>nested loop</b> is a loop inside a loop. The <b>outer loop</b> (<code>i</code>) controls the rows. The <b>inner loop</b> (<code>j</code>) prints the columns of one row and starts again from 1 for every new row.</p><p>Row <code>i</code> prints the numbers 1 to i. <code>printf("\\n")</code> after the inner loop moves the cursor to the next line. Without it, everything would print on a single line.</p>',
+code:[H,M,'    int lines, i, j;','    printf("Enter the number of lines: ");','    scanf("%d", &lines);','    for(i = 1; i <= lines; i++)','    {','        for(j = 1; j <= i; j++)','            printf("%d", j);','        printf("\\n");','    }','    return 0;','}'],
+inputs:[I('n','Lines (max 9)',5)],
+run(x){const n=Math.min(9,Math.max(1,parseInt(x.n)||1)),s=B();
+s.add(2,'Three int variables are declared.');
+s.add(3,'The prompt is printed.','Enter the number of lines: ');
+s.add(4,'lines = '+n,inp(n),{lines:n});
+for(let i=1;i<=n;i++){
+ s.add(5,'Outer loop: i = '+i+', check '+i+' <= '+n+' is true. This pass builds row '+i+'.','',{i});
+ for(let j=1;j<=i;j++){
+  s.add(7,'Inner loop: j = '+j+', check '+j+' <= '+i+' is true.','',{j});
+  s.add(8,'Prints j ('+j+') with no new line.',''+j);}
+ s.add(7,'j becomes '+(i+1)+', check '+(i+1)+' <= '+i+' is false, so the inner loop ends.','',{j:i+1});
+ s.add(9,'Row '+i+' is complete, so move to a new line.','\n');}
+s.add(5,'i becomes '+(n+1)+', check '+(n+1)+' <= '+n+' is false, so the outer loop ends.','',{i:n+1});
+s.add(11,'main returns 0: the program ended successfully.');return s.st}},
+{t:'Experiment 5: First n natural numbers (do-while loop)',
 aim:'Aim: Display the first n natural numbers using a do-while loop.',
 concept:'<p>Natural numbers are 1, 2, 3, ... A <b>do-while</b> loop is an <i>exit-controlled</i> loop: the body runs first and the condition is checked afterwards, so the body always runs at least once.</p><p>Syntax: <code>do { body } while (condition);</code> (note the semicolon at the end).</p>',
 code:[H,M,'    int i = 1, n;','    printf("Enter the value of n: ");','    scanf("%d", &n);','    do {','        printf("%d\\n", i);','        i++;','    } while (i <= n);','    return 0;','}'],
@@ -140,7 +159,7 @@ s.add(2,'i starts at 1. n is not set yet.','',{i:1});s.add(3,'Asks for n.','Ente
 do{s.add(5,'Enter the loop body (no condition check yet).');s.add(6,'Prints i = '+i,i+'\n');i++;s.add(7,'i is incremented to '+i,'',{i});
 s.add(8,'Check: '+i+' <= '+n+' is '+(i<=n)+(i<=n?', so repeat.':', so the loop stops.'));}while(i<=n);
 s.add(9,'Program ends.');return s.st}},
-{t:'Experiment 5: Sum and product of digits (while loop)',
+{t:'Experiment 6: Sum and product of digits (while loop)',
 aim:'Aim: Find the sum and product of all digits of a number using a while loop.',
 concept:'<p>A <b>while</b> loop checks its condition <i>before</i> every pass. To split a number into digits: <code>num % 10</code> gives the last digit and <code>num / 10</code> removes it (integer division).</p><p>We keep adding digits to <code>sum</code> and multiplying into <code>product</code> (which must start at 1, not 0).</p>',
 code:[H,M,'    int num, digit, sum = 0, product = 1;','    printf("Enter a number: ");','    scanf("%d", &num);','    while (num > 0) {','        digit = num % 10;','        sum = sum + digit;','        product = product * digit;','        num = num / 10;','    }','    printf("Sum of digits = %d\\n", sum);','    printf("Product of digits = %d\\n", product);','    return 0;','}'],
@@ -152,7 +171,7 @@ sum+=d;s.add(7,'sum = '+(sum-d)+' + '+d+' = '+sum,'',{sum});pr*=d;s.add(8,'produ
 n=Math.floor(n/10);s.add(9,'num = num / 10 = '+n,'',{num:n});}
 s.add(5,'Check: num > 0 is false, the loop ends.');
 s.add(11,'Prints the sum.','Sum of digits = '+sum+'\n');s.add(12,'Prints the product.','Product of digits = '+pr+'\n');s.add(13,'Program ends.');return s.st}},
-{t:'Experiment 6: Largest of three numbers (nested if-else)',
+{t:'Experiment 7: Largest of three numbers (nested if-else)',
 aim:'Aim: Find the largest of three numbers using nested if-else statements.',
 concept:'<p><b>if-else</b> chooses between two paths based on a condition. A <b>nested</b> if-else places one if-else inside another so we can make a second decision after the first.</p><p>Here the outer if finds the bigger of a and b, and the inner if compares that winner with c.</p>',
 code:[H,M,'    int a, b, c;','    printf("Enter three numbers: ");','    scanf("%d %d %d", &a, &b, &c);','    if (a > b) {','        if (a > c) printf("Largest number = %d\\n", a);','        else printf("Largest number = %d\\n", c);','    } else {','        if (b > c) printf("Largest number = %d\\n", b);','        else printf("Largest number = %d\\n", c);','    }','    return 0;','}'],
@@ -163,7 +182,93 @@ if(a>b){s.add(5,'a > b ('+a+' > '+b+') is true, take the outer if branch.');
 if(a>c)s.add(6,'a > c is true, so a is the largest.','Largest number = '+a+'\n');else s.add(6,'a > c is false, so the else prints c.','Largest number = '+c+'\n');}
 else{s.add(5,'a > b ('+a+' > '+b+') is false, take the outer else branch.');s.add(8,'Now compare b with c.');
 if(b>c)s.add(9,'b > c is true, so b is the largest.','Largest number = '+b+'\n');else s.add(10,'b > c is false, so c is the largest.','Largest number = '+c+'\n');}
-s.add(12,'Program ends.');return s.st}}
+s.add(12,'Program ends.');return s.st}},
+{t:'PRAC 1: Variables, assignment and swapping',
+aim:'Aim: See how a variable is created, how = copies a value, why swapping needs a temporary variable, and what += and ++ do.',
+concept:'<p>A <b>variable</b> is a named box in memory. <code>=</code> is <b>assignment</b>: it copies the value on the right into the variable on the left. It is not a maths equals sign.</p><p>To swap two variables you need a third helper (<code>temp</code>), otherwise the first value is overwritten and lost. <code>a += 5</code> means <code>a = a + 5</code> and <code>b++</code> means <code>b = b + 1</code>.</p>',
+code:[H,M,'    int a, b, temp;','    printf("Enter a and b: ");','    scanf("%d %d", &a, &b);','    printf("Before: a = %d, b = %d\\n", a, b);','    temp = a;','    a = b;','    b = temp;','    printf("After swap: a = %d, b = %d\\n", a, b);','    a += 5;','    b++;','    printf("Final: a = %d, b = %d\\n", a, b);','    return 0;','}'],
+inputs:[I('a','a',10),I('b','b',20)],
+run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0,s=B();
+s.add(2,'Three int variables are declared. temp is only a helper box.');
+s.add(3,'The prompt is printed.','Enter a and b: ');
+s.add(4,'scanf stores the typed values.',inp(a+' '+b),{a,b});
+s.add(5,'Prints the values before swapping.','Before: a = '+a+', b = '+b+'\n');
+s.add(6,'temp = a keeps a safe copy of a ('+a+').','',{temp:a});
+s.add(7,'a = b overwrites a with '+b+'. Without temp, the old a would be lost.','',{a:b});
+s.add(8,'b = temp puts the old a ('+a+') into b.','',{b:a});
+s.add(9,'Prints the swapped values.','After swap: a = '+b+', b = '+a+'\n');
+s.add(10,'a += 5 is short for a = a + 5, so a = '+(b+5),'',{a:b+5});
+s.add(11,'b++ adds 1 to b, so b = '+(a+1),'',{b:a+1});
+s.add(12,'Prints the final values.','Final: a = '+(b+5)+', b = '+(a+1)+'\n');
+s.add(13,'Program ends.');return s.st}},
+{t:'PRAC 2: How if, else-if and else decide (grade checker)',
+aim:'Aim: Understand that conditions are checked from top to bottom and only the first true branch runs.',
+concept:'<p>An <b>if / else if / else</b> ladder tests conditions in order. As soon as one is true, its block runs and <b>all the remaining branches are skipped</b>. <code>else</code> runs only when nothing above was true.</p><p>Order matters: if you checked <code>marks &gt;= 35</code> first, everyone above 35 would get grade C. Try 80, 60, 40 and 20.</p>',
+code:[H,M,'    int marks;','    printf("Enter marks (0-100): ");','    scanf("%d", &marks);','    if (marks >= 75)','        printf("Grade A\\n");','    else if (marks >= 50)','        printf("Grade B\\n");','    else if (marks >= 35)','        printf("Grade C\\n");','    else','        printf("Fail\\n");','    return 0;','}'],
+inputs:[I('m','Marks',62)],
+run(x){const m=parseInt(x.m)||0,s=B();
+s.add(2,'marks is declared.');s.add(3,'The prompt is printed.','Enter marks (0-100): ');s.add(4,'marks = '+m,inp(m),{marks:m});
+let done=false;
+for(const [lim,g,c,p] of [[75,'A',5,6],[50,'B',7,8],[35,'C',9,10]]){
+ const ok=m>=lim;
+ s.add(c,'Check: '+m+' >= '+lim+' is '+ok+(ok?', so this branch runs and the rest are skipped.':', so move to the next condition.'));
+ if(ok){s.add(p,'Prints the grade.','Grade '+g+'\n');done=true;break}}
+if(!done){s.add(11,'No condition was true, so else runs.');s.add(12,'Prints Fail.','Fail\n')}
+s.add(13,'Program ends.');return s.st}},
+{t:'PRAC 3: How a for loop works (multiplication table)',
+aim:'Aim: See the three parts of a for loop: start, condition and update.',
+concept:'<p><code>for (i = 1; i &lt;= 5; i++)</code> has three parts: <b>initialise</b> (<code>i = 1</code>, runs once), <b>condition</b> (<code>i &lt;= 5</code>, checked before every pass) and <b>update</b> (<code>i++</code>, runs after every pass).</p><p>When the condition becomes false the loop stops and the program continues after it. Here the loop prints the first 5 lines of a table.</p>',
+code:[H,M,'    int n, i;','    printf("Enter a number: ");','    scanf("%d", &n);','    for (i = 1; i <= 5; i++)','        printf("%d x %d = %d\\n", n, i, n * i);','    return 0;','}'],
+inputs:[I('n','Number',7)],
+run(x){const n=parseInt(x.n)||0,s=B();
+s.add(2,'n and i are declared.');s.add(3,'The prompt is printed.','Enter a number: ');s.add(4,'n = '+n,inp(n),{n});
+for(let i=1;i<=5;i++){
+ s.add(5,(i===1?'Start: i = 1. ':'Update: i++ makes i = '+i+'. ')+'Check '+i+' <= 5 is true.','',{i});
+ s.add(6,'Prints '+n+' x '+i+' = '+(n*i),n+' x '+i+' = '+(n*i)+'\n');}
+s.add(5,'Update: i++ makes i = 6. Check 6 <= 5 is false, so the loop ends.','',{i:6});
+s.add(7,'Program ends.');return s.st}},
+{t:'PRAC 4: How a while loop works (factorial)',
+aim:'Aim: Calculate n! (1 × 2 × ... × n) and see how a variable keeps changing inside a loop.',
+concept:'<p>A <b>while</b> loop repeats as long as its condition is true. You must change something inside the loop (here <code>i++</code>) or the condition never becomes false and the loop runs forever.</p><p><code>fact</code> starts at 1 because multiplying by 0 would keep the answer 0. Each pass does <code>fact = fact * i</code>, so the value grows: 1, 2, 6, 24, 120 ...</p>',
+code:[H,M,'    int n, i = 1;','    long fact = 1;','    printf("Enter n: ");','    scanf("%d", &n);','    while (i <= n) {','        fact = fact * i;','        i++;','    }','    printf("Factorial = %ld\\n", fact);','    return 0;','}'],
+inputs:[I('n','n (0 to 10)',5)],
+run(x){const n=Math.min(10,Math.max(0,parseInt(x.n)||0)),s=B();let f=1;
+s.add(2,'i starts at 1.','',{i:1});s.add(3,'fact starts at 1, not 0.','',{fact:1});
+s.add(4,'The prompt is printed.','Enter n: ');s.add(5,'n = '+n,inp(n),{n});
+for(let i=1;i<=n;i++){s.add(6,'Check: '+i+' <= '+n+' is true.');const o=f;f*=i;
+ s.add(7,'fact = '+o+' × '+i+' = '+f,'',{fact:f});s.add(8,'i becomes '+(i+1),'',{i:i+1});}
+s.add(6,'Check: '+(n+1)+' <= '+n+' is false, so the loop ends.');
+s.add(10,'Prints the factorial.','Factorial = '+f+'\n');s.add(11,'Program ends.');return s.st}},
+{t:'PRAC 5: How switch-case picks a branch (mini calculator)',
+aim:'Aim: Use switch to run one case out of many and see what break does.',
+concept:'<p><b>switch</b> compares one value with each <code>case</code> and jumps straight to the match. <code>break</code> leaves the switch; without it, execution would <i>fall through</i> into the next case. <code>default</code> runs when no case matches.</p><p>Choices: 1 = add, 2 = subtract, 3 = multiply, 4 = divide. Try 4 with b = 0, or choice 9.</p>',
+code:[H,M,'    int a, b, op;','    printf("Enter a, b and choice (1-4): ");','    scanf("%d %d %d", &a, &b, &op);','    switch (op) {','        case 1: printf("Sum = %d\\n", a + b); break;','        case 2: printf("Difference = %d\\n", a - b); break;','        case 3: printf("Product = %d\\n", a * b); break;','        case 4: printf("Quotient = %d\\n", a / b); break;','        default: printf("Invalid choice\\n");','    }','    return 0;','}'],
+inputs:[I('a','a',12),I('b','b',4),I('o','Choice (1-4)',3)],
+run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0,o=parseInt(x.o)||0,s=B();
+s.add(2,'Three int variables are declared.');s.add(3,'The prompt is printed.','Enter a, b and choice (1-4): ');
+s.add(4,'Values are stored.',inp(a+' '+b+' '+o),{a,b,op:o});
+s.add(5,'switch looks at op = '+o+' and jumps to the matching case.');
+if(o>=1&&o<=4){
+ if(o===4&&b===0)s.add(8,'Case 4 matches, but a / 0 is undefined: a real program would crash here. Try another b.','Runtime error: division by zero\n');
+ else{const r=[a+b,a-b,a*b,b?Math.trunc(a/b):0][o-1],nm=['Sum','Difference','Product','Quotient'][o-1];
+  s.add(5+o,'Case '+o+' matches, so it prints the result.',nm+' = '+r+'\n');
+  s.add(10,'break jumps out of the switch, so the later cases do not run.');}}
+else s.add(9,'No case matches, so default runs.','Invalid choice\n');
+s.add(11,'Program ends.');return s.st}},
+{t:'PRAC 6: if inside a loop (sum of even and odd numbers)',
+aim:'Aim: Combine a loop with an if-else to sort numbers into two running totals.',
+concept:'<p>Loops and conditions work together. The loop visits every number from 1 to n and the <b>if</b> decides what to do with each one.</p><p><code>i % 2 == 0</code> is true when the remainder after dividing by 2 is 0, which means i is even. <code>evenSum</code> and <code>oddSum</code> are <b>accumulators</b>: they start at 0 and grow each time a matching number is found.</p>',
+code:[H,M,'    int n, i, evenSum = 0, oddSum = 0;','    printf("Enter n: ");','    scanf("%d", &n);','    for (i = 1; i <= n; i++) {','        if (i % 2 == 0)','            evenSum += i;','        else','            oddSum += i;','    }','    printf("Even sum = %d\\n", evenSum);','    printf("Odd sum = %d\\n", oddSum);','    return 0;','}'],
+inputs:[I('n','n (max 10)',6)],
+run(x){const n=Math.min(10,Math.max(0,parseInt(x.n)||0)),s=B();let e=0,o=0;
+s.add(2,'Both totals start at 0.','',{evenSum:0,oddSum:0});s.add(3,'The prompt is printed.','Enter n: ');s.add(4,'n = '+n,inp(n),{n});
+for(let i=1;i<=n;i++){
+ s.add(5,'i = '+i+', check '+i+' <= '+n+' is true.','',{i});
+ const ev=i%2===0;
+ s.add(6,'Check: '+i+' % 2 == 0 is '+ev+(ev?' (even).':' (odd), so go to else.'));
+ if(ev){e+=i;s.add(7,'evenSum = '+e,'',{evenSum:e})}else{o+=i;s.add(9,'oddSum = '+o,'',{oddSum:o})}}
+s.add(5,'i becomes '+(n+1)+', check '+(n+1)+' <= '+n+' is false, so the loop ends.','',{i:n+1});
+s.add(11,'Prints the even total.','Even sum = '+e+'\n');s.add(12,'Prints the odd total.','Odd sum = '+o+'\n');s.add(13,'Program ends.');return s.st}}
 ];
 let cur=0,steps=[],k=-1,timer=null;
 const $=id=>document.getElementById(id);
@@ -192,7 +297,7 @@ $('back').onclick=()=>{stop();if(k>-1){k--;draw()}};
 $('reset').onclick=()=>{stop();k=-1;draw()};
 $('auto').onclick=()=>{if(timer){stop();return}if(k>=steps.length-1)k=-1;$('auto').textContent='Pause';next();timer=setInterval(next,+$('spd').value)};
 $('spd').onchange=()=>{if(timer){clearInterval(timer);timer=setInterval(next,+$('spd').value)}};
-EX.forEach((e,i)=>{const b=document.createElement('button');b.textContent=i+1;b.title=e.t;b.setAttribute('aria-label','Experiment '+(i+1));
+EX.forEach((e,i)=>{const b=document.createElement('button'),pr=i>=7;b.textContent=pr?'P'+(i-6):i+1;b.title=e.t;b.className=pr?'pr':'';b.setAttribute('aria-label',pr?'Practice '+(i-6):'Experiment '+(i+1));
  b.onclick=()=>{stop();cur=i;document.querySelectorAll('#list button').forEach((x,j)=>x.classList.toggle('on',j===i));build()};$('list').appendChild(b)});
 $('list').firstChild.classList.add('on');build();
 </script>
