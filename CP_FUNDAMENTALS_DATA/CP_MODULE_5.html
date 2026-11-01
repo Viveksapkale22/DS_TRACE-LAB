@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>CP_MODULE 5</title></head>
+<body>
+<div id="app"></div>
+<script src="trace_engine.js"></script>
+<script>
+TR.mount({n:5,title:'Pointer',sub:'3 hours | LO5 | Addresses, pointer variables, dereferencing, pointer arithmetic, void pointers. Addresses shown are made-up examples: real ones differ on every run.',
+topics:['5.1 Pointer: introduction, definition and uses of pointers, address operator, pointer variables, dereferencing pointer, void pointer, pointer arithmetic, pointers to pointers, pointers and array'],
+ex:[
+{t:'M5.1: Address operator, pointer variable and dereferencing',
+aim:'Aim: Store an address in a pointer and use * to read and change the original variable.',
+concept:'<p>Every variable lives at a memory <b>address</b>. The <b>address-of operator</b> <code>&amp;x</code> gives that address. A <b>pointer variable</b> such as <code>int *p</code> stores an address. <b>Dereferencing</b> <code>*p</code> means "go to that address and use the value there", so <code>*p = 25</code> changes <code>x</code> itself.</p><p>Pointers let functions modify caller variables and are the basis of arrays, strings and dynamic data structures.</p>',
+code:[H,M,'    int x = 10;','    int *p;          // p can hold the address of an int','    p = &x;          // & gives the address of x','    printf("x = %d, &x = %p\\n", x, (void *)&x);','    printf("p = %p, *p = %d\\n", (void *)p, *p);','    *p = 25;         // * follows the address','    printf("x is now %d\\n", x);','    return 0;','}'],
+inputs:[],
+run:()=>S([[2,'x is a normal variable stored at some address (example: 0x1000).','',{x:10,'&x':'0x1000'}],[3,'p is a pointer variable: it will hold the address of an int. It has no useful value yet.'],[4,'The address-of operator gives the address of x, so p now holds 0x1000.','',{p:'0x1000'}],[5,'%p prints an address. On a real machine it looks different on every run.','x = 10, &x = 0x1000\n'],[6,'*p means the value stored at the address in p, which is x.','p = 0x1000, *p = 10\n'],[7,'*p = 25 writes 25 into the memory p points to, so x changes without using its name.','',{x:25}],[8,'x really changed.','x is now 25\n'],[9,'Program ends.']])},
+{t:'M5.2: Passing pointers to a function (call by reference)',
+aim:'Aim: Fix the swap problem from Module 3 by passing addresses.',
+concept:'<p>If you pass <b>addresses</b> (<code>swap(&amp;a, &amp;b)</code>) the function receives pointers to the original variables. Writing through the pointers (<code>*p</code>, <code>*q</code>) changes the caller variables. This is called <b>call by reference</b> (simulated with pointers, since C passes only by value).</p>',
+code:[H,'void swap(int *p, int *q) {','    int t = *p;','    *p = *q;','    *q = t;','}',M,'    int a = 10, b = 20;','    swap(&a, &b);','    printf("a = %d, b = %d\\n", a, b);','    return 0;','}'],
+inputs:[],
+run:()=>S([[7,'a and b are created (example addresses 0x1000 and 0x1004).','',{a:10,b:20,'&a':'0x1000','&b':'0x1004'}],[8,'The ADDRESSES are sent, so p and q point to the originals.','',{p:'0x1000',q:'0x1004'}],[2,'t = *p reads the value at p, which is 10.','',{t:10}],[3,'*p = *q writes 20 into the place p points to, which is a.','',{a:20}],[4,'*q = t writes 10 into b.','',{b:10}],[5,'The function ends. p, q and t vanish, but a and b really changed.','',{p:null,q:null,t:null}],[9,'The swap worked.','a = 20, b = 10\n'],[10,'Program ends.']])},
+{t:'M5.3: Pointer arithmetic and arrays',
+aim:'Aim: See that an array name is an address and that p++ moves by one element, not one byte.',
+concept:'<p>The array name <code>arr</code> is the address of its first element, so <code>int *p = arr;</code> makes p point to <code>arr[0]</code>. <b>Pointer arithmetic</b> is scaled by the type size: <code>p + 1</code> moves ahead by one <code>int</code> (4 bytes), not by 1 byte.</p><p><code>arr[i]</code> is the same as <code>*(arr + i)</code>, and <code>p[-1]</code> is the same as <code>*(p - 1)</code>.</p>',
+code:[H,M,'    int arr[3] = {10, 20, 30};','    int *p = arr;        // array name = address of arr[0]','    printf("%d\\n", *p);','    p++;                 // moves ahead by one int (4 bytes)','    printf("%d\\n", *p);','    printf("%d\\n", *(p + 1));','    printf("%d\\n", p[-1]);','    return 0;','}'],
+inputs:[],
+run:()=>S([[2,'The three ints sit side by side (example addresses 0x2000, 0x2004, 0x2008).','',{arr:'[10, 20, 30]'}],[3,'The array name is the address of its first element, so p points to arr[0].','',{p:'0x2000 (arr[0])'}],[4,'*p is the value at arr[0].','10\n'],[5,'p++ moves p by one whole int (4 bytes), so it now points to arr[1].','',{p:'0x2004 (arr[1])'}],[6,'*p is now arr[1].','20\n'],[7,'*(p + 1) is the element after p: arr[2].','30\n'],[8,'p[-1] is *(p - 1), the element before p: arr[0].','10\n'],[9,'Program ends.']])},
+{t:'M5.4: Void pointer and pointer to pointer',
+aim:'Aim: Use a generic void pointer with casting, and follow two levels of pointers.',
+concept:'<p>A <b>void pointer</b> (<code>void *</code>) can hold the address of any type, but it has no type information, so you must <b>cast</b> it before dereferencing: <code>*(int *)vp</code>. It is used in generic code such as <code>malloc</code>. Pointer arithmetic on void pointers is not allowed in standard C.</p><p>A <b>pointer to pointer</b> (<code>int **pp</code>) stores the address of another pointer. <code>**pp</code> follows two addresses to reach the final value.</p>',
+code:[H,M,'    int n = 7;','    float f = 2.5;','    void *vp;','    vp = &n;','    printf("int via void*: %d\\n", *(int *)vp);','    vp = &f;','    printf("float via void*: %.1f\\n", *(float *)vp);','    int *p = &n;','    int **pp = &p;       // pointer to pointer','    printf("**pp = %d\\n", **pp);','    return 0;','}'],
+inputs:[],
+run:()=>S([[2,'n is an int (example address 0x3000).','',{n:7,'&n':'0x3000'}],[3,'f is a float (example address 0x3004).','',{f:2.5,'&f':'0x3004'}],[4,'vp is a generic pointer: it can hold any address but does not know the type.'],[5,'vp now holds the address of n.','',{vp:'0x3000'}],[6,'*vp alone is not allowed. Cast to (int *) first, then dereference.','int via void*: 7\n'],[7,'The same vp can point to a float.','',{vp:'0x3004'}],[8,'Cast to (float *) before dereferencing.','float via void*: 2.5\n'],[9,'p holds the address of n.','',{p:'0x3000'}],[10,'pp holds the address of p itself (example 0x3008).','',{pp:'0x3008'}],[11,'*pp is p, and **pp is n: two steps of following addresses.','**pp = 7\n'],[12,'Program ends.']])}
+]});
+</script>
+</body>
+</html>

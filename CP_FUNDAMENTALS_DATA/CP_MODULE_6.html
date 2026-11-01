@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>CP_MODULE 6</title></head>
+<body>
+<div id="app"></div>
+<script src="trace_engine.js"></script>
+<script>
+TR.mount({n:6,title:'Files',sub:'2 hours | LO6 | Opening, closing, creating, reading and processing files. File contents are simulated in the page; the | sign in the file chips stands for a new line.',
+topics:['6.1 Files: file operations: opening, closing, creating, reading, processing file'],
+ex:[
+{t:'M6.1: Creating and writing a file',
+aim:'Aim: Open a file in write mode, check that it opened, write to it and close it.',
+concept:'<p>Files are used through a <b>file pointer</b> of type <code>FILE *</code>. <code>fopen(name, mode)</code> opens a file and returns NULL on failure. Modes: <code>"r"</code> read, <code>"w"</code> write (creates the file, or <b>erases</b> it if it exists), <code>"a"</code> append (keeps old content).</p><p><code>fprintf</code> and <code>fputs</code> write text, and <code>fclose</code> saves and closes the file. Always check for NULL and always close.</p>',
+code:[H,M,'    FILE *fp;','    fp = fopen("data.txt", "w");   // w = create / overwrite','    if (fp == NULL) {','        printf("Cannot open file\\n");','        return 1;','    }','    fprintf(fp, "Hello\\n");','    fputs("C files\\n", fp);','    fclose(fp);                    // saves and closes','    printf("File written\\n");','    return 0;','}'],
+inputs:[],
+run:()=>S([[2,'fp is a file pointer. It does not point to a file yet.'],[3,'fopen creates data.txt in write mode and returns a pointer to the open file.','',{fp:'open (write)','data.txt':'(empty)'}],[4,'Check fp == NULL: false, because the file opened successfully.'],[8,'fprintf works like printf but writes into the file.','',{'data.txt':'Hello'}],[9,'fputs writes a string into the file.','',{'data.txt':'Hello | C files'}],[10,'fclose flushes the data to disk and closes the file. Forgetting it can lose data.','',{fp:'closed'}],[11,'Prints on the screen, not in the file.','File written\n'],[12,'Program ends.']])},
+{t:'M6.2: Reading a file character by character',
+aim:'Aim: Read until end of file (EOF) and count characters and lines.',
+concept:'<p><code>fgetc(fp)</code> reads one character and returns <code>EOF</code> (a special negative value) at the end of the file. Because EOF is negative, the variable that stores the result must be an <code>int</code>, not a <code>char</code>.</p><p>The loop <code>while ((ch = fgetc(fp)) != EOF)</code> reads, stores and tests in one line. A newline character <code>\\n</code> marks the end of a line. Here the file data.txt holds: <code>Hi</code> on line 1 and <code>C</code> on line 2.</p>',
+code:[H,M,'    FILE *fp = fopen("data.txt", "r");','    int ch, chars = 0, lines = 0;','    if (fp == NULL)','        return 1;','    while ((ch = fgetc(fp)) != EOF) {','        chars++;',"        if (ch == '\\n')",'            lines++;','    }','    fclose(fp);','    printf("chars = %d, lines = %d\\n", chars, lines);','    return 0;','}'],
+inputs:[],
+run(){const f=['H','i','\n','C','\n'],s=B();let c=0,l=0;
+s.add(2,'Opens data.txt for reading. The file contains: Hi, newline, C, newline.','',{fp:'open (read)','data.txt':'Hi | C |'});
+s.add(3,'Two counters start at 0. ch is an int so that it can also hold EOF.','',{chars:0,lines:0});
+s.add(4,'Check fp == NULL: false, the file opened.');
+f.forEach(ch=>{const nm=ch==='\n'?'newline':"'"+ch+"'";
+ s.add(6,'fgetc reads the next character: '+nm+'. It is not EOF, so the loop continues.','',{ch:nm});c++;
+ s.add(7,'chars++ gives '+c,'',{chars:c});
+ s.add(8,'Check ch == newline: '+(ch==='\n')+'.');
+ if(ch==='\n'){l++;s.add(9,'A line ended, so lines++ gives '+l,'',{lines:l})}});
+s.add(6,'fgetc reaches the end of the file and returns EOF, so the loop stops.','',{ch:'EOF'});
+s.add(11,'The file is closed.','',{fp:'closed'});
+s.add(12,'Prints the counts.','chars = '+c+', lines = '+l+'\n');s.add(13,'Program ends.');return s.st}},
+{t:'M6.3: Reading numbers with fscanf and appending',
+aim:'Aim: Process a file of numbers (sum them), then append the result with mode "a".',
+concept:'<p><code>fscanf(fp, "%d", &amp;x)</code> works like scanf but reads from a file. It returns the <b>number of values read</b>, so <code>== 1</code> means success and anything else (EOF) means stop. This is the standard way to <b>process a file</b> of data.</p><p>Opening with <code>"a"</code> (append) keeps the old content and adds new data at the end. Here nums.txt starts as <code>4 6 10</code>.</p>',
+code:[H,M,'    FILE *fp = fopen("nums.txt", "r");','    int x, sum = 0;','    while (fscanf(fp, "%d", &x) == 1)','        sum += x;','    fclose(fp);','    fp = fopen("nums.txt", "a");   // a = append at the end','    fprintf(fp, " %d", sum);','    fclose(fp);','    printf("Sum = %d\\n", sum);','    return 0;','}'],
+inputs:[],
+run(){const v=[4,6,10],s=B();let sum=0;
+s.add(2,'Opens nums.txt for reading.','',{fp:'open (read)','nums.txt':'4 6 10'});
+s.add(3,'sum starts at 0.','',{sum:0});
+v.forEach(a=>{s.add(4,'fscanf reads the next number ('+a+') and returns 1, because one value was read.','',{x:a});sum+=a;s.add(5,'sum += x gives '+sum,'',{sum})});
+s.add(4,'fscanf finds no more data and returns EOF, which is not 1, so the loop stops.');
+s.add(6,'The reading is finished, so the file is closed.','',{fp:'closed'});
+s.add(7,'Mode "a" (append) reopens the file and keeps the old content. New data goes at the end.','',{fp:'open (append)'});
+s.add(8,'fprintf adds the sum after the old data.','',{'nums.txt':'4 6 10 '+sum});
+s.add(9,'Closed again, so the data is saved.','',{fp:'closed'});
+s.add(10,'Prints on the screen.','Sum = '+sum+'\n');s.add(11,'Program ends.');return s.st}}
+]});
+</script>
+</body>
+</html>

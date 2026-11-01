@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>CP_MODULE 3</title></head>
+<body>
+<div id="app"></div>
+<script src="trace_engine.js"></script>
+<script>
+TR.mount({n:3,title:'Functions and Parameter',sub:'5 hours | LO3 | Defining and calling functions, passing arguments, recursion and storage classes.',
+topics:['3.1 Function: introduction, function main, defining a function, accessing a function, function prototype, passing arguments to a function, recursion','3.2 Storage classes: auto, extern, static, register'],
+ex:[
+{t:'M3.1: Defining, declaring and calling a function',
+aim:'Aim: Follow a function call: arguments are copied into parameters, the function runs, and a value is returned.',
+concept:'<p>A <b>function</b> is a named block of code that does one job. Three parts: the <b>prototype</b> (declaration: name, parameter types, return type, placed before use), the <b>definition</b> (the body) and the <b>call</b>. Values you pass (<b>arguments</b>) are copied into the <b>parameters</b>. <code>return</code> sends one value back and ends the function. <code>main</code> is itself a function that the operating system calls.</p>',
+code:[H,'int add(int x, int y);        // prototype',M,'    int a, b, result;','    scanf("%d %d", &a, &b);','    result = add(a, b);          // function call','    printf("Sum = %d\\n", result);','    return 0;','}','','int add(int x, int y) {         // definition','    int s = x + y;','    return s;','}'],
+inputs:[I('a','a',7),I('b','b',5)],
+run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0;
+return S([[1,'Prototype: tells the compiler the name, parameter types and return type before the function is used.'],[3,'Three int variables are declared in main.'],[4,'scanf stores the typed values.',inp(a+' '+b),{a,b}],[5,'The call: the VALUES of a and b are copied into the parameters x and y, and control jumps to the function.'],[10,'The function starts with its own x and y.','',{x:a,y:b}],[11,'A local variable s is created inside the function.','',{s:a+b}],[12,'return s sends the value back to the caller. x, y and s are destroyed.','',{x:null,y:null,s:null}],[5,'Back in main: the returned value is stored in result.','',{result:a+b}],[6,'Prints the result.','Sum = '+(a+b)+'\n'],[7,'Program ends.']])}},
+{t:'M3.2: Passing arguments by value',
+aim:'Aim: Prove that a function receives COPIES of the arguments, so a swap inside the function does not change the originals.',
+concept:'<p>C passes arguments <b>by value</b>: the function gets copies. Changing a parameter changes only the copy. When the function ends, the copies disappear and the caller variables are untouched.</p><p>To change the caller variables you must pass their <b>addresses</b> (pointers). That is shown in Module 5.</p>',
+code:[H,'void swap(int x, int y) {','    int t = x;','    x = y;','    y = t;','}',M,'    int a = 10, b = 20;','    swap(a, b);','    printf("a = %d, b = %d\\n", a, b);','    return 0;','}'],
+inputs:[],
+run:()=>S([[7,'a and b are created in main.','',{a:10,b:20}],[8,'Call by value: copies are sent. x gets 10 and y gets 20.','',{x:10,y:20}],[2,'t keeps a copy of x.','',{t:10}],[3,'x = y changes only the COPY x. The original a is still 10.','',{x:20}],[4,'y = t changes only the copy y.','',{y:10}],[5,'The function ends: x, y and t vanish. a and b were never changed.','',{x:null,y:null,t:null}],[9,'The swap had no effect on main.','a = 10, b = 20\n'],[10,'Program ends.']])},
+{t:'M3.3: Recursion (factorial)',
+aim:'Aim: Watch a function call itself, go down to the base case, then return up the call stack.',
+concept:'<p><b>Recursion</b> means a function calls itself. Every recursive function needs (1) a <b>base case</b> that stops the calls and (2) a recursive step that moves toward it. Each call gets its own copy of the parameters on the <b>call stack</b>.</p><p><code>fact(n) = n * fact(n-1)</code> and <code>fact(1) = 1</code>. The stack chip below shows the active calls.</p>',
+code:[H,'int fact(int n) {','    if (n <= 1)','        return 1;','    return n * fact(n - 1);','}',M,'    int n;','    scanf("%d", &n);','    printf("%d! = %d\\n", n, fact(n));','    return 0;','}'],
+inputs:[I('n','n (1 to 6)',4)],
+run(x){const n=Math.min(6,Math.max(1,parseInt(x.n)||1)),s=B();
+const st=k=>{const a=[];for(let i=n;i>=k;i--)a.push('fact('+i+')');return a.join(' > ')};
+s.add(7,'n is declared in main.');s.add(8,'n = '+n,inp(n),{n});
+s.add(9,'main calls fact('+n+'). Each call gets its own copy of n on the call stack.','',{stack:st(n)});
+for(let k=n;k>=1;k--){s.add(2,'fact('+k+'): check '+k+' <= 1 is '+(k<=1)+'.','',{stack:st(k)});
+ if(k>1)s.add(4,'Not the base case: it needs '+k+' * fact('+(k-1)+'), so it calls itself.');else s.add(3,'Base case: returns 1. Now the calls return one by one.')}
+let v=1;for(let k=2;k<=n;k++){const o=v;v*=k;s.add(4,'fact('+k+') returns '+k+' * '+o+' = '+v+'.','',{stack:k<n?st(k+1):'(empty)'})}
+s.add(9,'Prints the answer.',n+'! = '+v+'\n');s.add(10,'Program ends.');return s.st}},
+{t:'M3.4: Storage classes (auto and static)',
+aim:'Aim: Compare an auto variable (reborn on every call) with a static variable (remembers its value).',
+concept:'<p><b>auto</b> (default for local variables): created when the function starts, destroyed when it ends. <b>static</b>: created once and keeps its value between calls (initialised only once). <b>extern</b>: declares a global variable defined elsewhere (another file or below). <b>register</b>: a hint to keep a variable in a CPU register for speed (you cannot take its address).</p>',
+code:[H,'void counter() {','    int a = 0;          // auto: new each call','    static int s = 0;   // static: kept between calls','    a++;','    s++;','    printf("auto a = %d, static s = %d\\n", a, s);','}',M,'    counter();','    counter();','    counter();','    return 0;','}'],
+inputs:[],
+run(){const s=B();
+for(let c=1;c<=3;c++){s.add(8+c,'Call number '+c+'.');
+ s.add(2,'auto a is created again and set to 0: a fresh copy every call.','',{a:0});
+ s.add(3,c===1?'static s is created and set to 0 only ONCE, at program start.':'This initialisation is skipped. static s still holds '+(c-1)+' from the last call.','',{s:c-1});
+ s.add(4,'a++ gives 1.','',{a:1});s.add(5,'s++ gives '+c+'.','',{s:c});
+ s.add(6,'Prints both values.','auto a = 1, static s = '+c+'\n');
+ s.add(7,'The function returns: auto a is destroyed, static s is kept.','',{a:null})}
+s.add(12,'Program ends.');return s.st}}
+]});
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>CP_MODULE 1</title></head>
+<body>
+<div id="app"></div>
+<script src="trace_engine.js"></script>
+<script>
+const n=x=>x?1:0;
+const bin=v=>v.toString(2).padStart(8,'0');
+TR.mount({n:1,title:'Fundamentals of C-Programming',sub:'6 hours | LO1, LO2 | Structure of a C program, data types, operators, input and output.',
+topics:['1.1 Character set, identifiers and keywords, data types, constants, variables','1.2 Operators: arithmetic, relational, logical, assignment, unary, conditional, bitwise, comma, other operators; expressions, statements, library functions, preprocessor','1.3 Data input and output: getchar(), putchar(), scanf(), printf(), gets(), puts(); structure of a C program'],
+ex:[
+{t:'M1.1: Structure of a C program, preprocessor and library functions',
+aim:'Aim: Understand the parts of a C program and what #include, #define and a library function do.',
+concept:'<p>Every C program has <b>comments</b>, <b>preprocessor lines</b> (<code>#include</code>, <code>#define</code>) that are handled before compiling, and a <code>main()</code> function where execution starts. Statements end with <code>;</code> and blocks use <code>{ }</code>.</p><p><b>Library functions</b> such as <code>printf</code> (stdio.h) and <code>sqrt</code> (math.h) are ready-made code that you call. <code>#define PI 3.14</code> is a text replacement done by the preprocessor, not a variable.</p>',
+code:['/* Structure of a C program */',H,'#include <math.h>','#define PI 3.14','',M,'    float r = 2.0, area;','    area = PI * r * r;','    printf("Area = %.2f\\n", area);','    printf("Square root of 16 = %.0f\\n", sqrt(16));','    return 0;','}'],
+inputs:[],
+run:()=>S([[0,'A comment is ignored by the compiler. It only explains the code.'],[1,'Preprocessor: stdio.h gives us printf and scanf.'],[2,'math.h gives library functions such as sqrt. (With gcc, link with -lm.)'],[3,'#define PI 3.14: before compiling, every PI in the code is replaced by 3.14.'],[5,'Execution always starts at main().'],[6,'r is stored as 2.0. area is created but has no value yet.','',{r:'2.0'}],[7,'PI becomes 3.14, so area = 3.14 x 2.0 x 2.0 = 12.56','',{area:'12.56'}],[8,'Prints the area with 2 decimals.','Area = 12.56\n'],[9,'sqrt(16) is a library function call that returns 4.','Square root of 16 = 4\n'],[10,'return 0 tells the operating system that the program succeeded.'],[11,'The closing brace ends main().']])},
+{t:'M1.2: Data types, variables and constants',
+aim:'Aim: See int, float and char variables, a #define constant, a const variable and sizeof.',
+concept:'<p>A <b>variable</b> is a named memory box with a <b>data type</b>: <code>int</code> (whole numbers), <code>float</code>/<code>double</code> (decimals), <code>char</code> (one character, stored as its ASCII code). Identifiers (names) use letters, digits and <code>_</code>, cannot start with a digit and cannot be a <b>keyword</b> such as <code>int</code> or <code>while</code>.</p><p><b>Constants</b> never change: <code>#define MAX 100</code> (text replacement) or <code>const int DAYS = 7;</code> (a variable that cannot be modified). Format codes: <code>%d</code> int, <code>%f</code> float, <code>%c</code> char.</p>',
+code:[H,'#define MAX 100',M,'    int age = 20;','    float price = 99.5;',"    char grade = 'A';",'    const int DAYS = 7;','    printf("%d %.1f %c\\n", age, price, grade);','    printf("grade as number = %d\\n", grade);','    printf("MAX = %d, DAYS = %d\\n", MAX, DAYS);','    printf("sizeof: int=%zu float=%zu char=%zu\\n", sizeof(int), sizeof(float), sizeof(char));','    return 0;','}'],
+inputs:[],
+run:()=>S([[1,'#define MAX 100: the preprocessor will replace MAX with 100.'],[3,'An int variable named age is created and set to 20.','',{age:20}],[4,'A float holds decimal values.','',{price:99.5}],[5,'A char holds one character. It is really stored as the ASCII code 65.','',{grade:"'A' (65)"}],[6,'const makes DAYS read-only: DAYS = 8; later would be a compile error.','',{DAYS:7}],[7,'%d prints the int, %.1f one decimal place, %c a character.','20 99.5 A\n'],[8,'Printing a char with %d shows its ASCII number.','grade as number = 65\n'],[9,'MAX was replaced by 100 before compiling.','MAX = 100, DAYS = 7\n'],[10,'sizeof gives the bytes used by a type. These are the typical values on a modern PC.','sizeof: int=4 float=4 char=1\n'],[11,'Program ends.']])},
+{t:'M1.3: Arithmetic, relational and logical operators',
+aim:'Aim: Watch / and % on integers, comparisons that give 1 or 0, and the logical operators && || !.',
+concept:'<p><b>Arithmetic</b>: <code>+ - * / %</code>. Dividing two ints drops the decimal part (17/5 = 3). <code>%</code> gives the remainder (17%5 = 2).</p><p><b>Relational</b>: <code>&gt; &lt; &gt;= &lt;= == !=</code> give <b>1 (true)</b> or <b>0 (false)</b>. <b>Logical</b>: <code>&amp;&amp;</code> (both true), <code>||</code> (at least one true), <code>!</code> (reverse). In C, any non-zero value counts as true.</p>',
+code:[H,M,'    int a, b;','    scanf("%d %d", &a, &b);','    printf("a / b = %d, a %% b = %d\\n", a / b, a % b);','    printf("a > b: %d\\n", a > b);','    printf("a == b: %d\\n", a == b);','    printf("both positive: %d\\n", (a > 0) && (b > 0));','    printf("any positive: %d\\n", (a > 0) || (b > 0));','    printf("not a: %d\\n", !a);','    return 0;','}'],
+inputs:[I('a','a',17),I('b','b',5)],
+run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0,s=B();
+s.add(2,'Two int variables are declared.');s.add(3,'scanf stores the typed values.',inp(a+' '+b),{a,b});
+if(b===0){s.add(4,'a / 0 and a % 0 are undefined: a real program crashes here. Try a non-zero b.','Runtime error: division by zero\n');return s.st}
+s.add(4,a+' / '+b+' = '+Math.trunc(a/b)+' (decimal part dropped), '+a+' % '+b+' = '+(a%b)+' (remainder).','a / b = '+Math.trunc(a/b)+', a % b = '+(a%b)+'\n');
+s.add(5,'Check '+a+' > '+b+': '+(a>b?'true, prints 1':'false, prints 0'),'a > b: '+n(a>b)+'\n');
+s.add(6,'Check '+a+' == '+b+' (two equals signs compare, one assigns): '+n(a===b),'a == b: '+n(a===b)+'\n');
+s.add(7,'&& needs BOTH sides true: ('+n(a>0)+') and ('+n(b>0)+') gives '+n(a>0&&b>0),'both positive: '+n(a>0&&b>0)+'\n');
+s.add(8,'|| needs at least ONE side true: gives '+n(a>0||b>0),'any positive: '+n(a>0||b>0)+'\n');
+s.add(9,'! reverses the truth value. '+a+' is '+(a?'non-zero (true)':'zero (false)')+', so !a is '+n(!a),'not a: '+n(!a)+'\n');
+s.add(10,'Program ends.');return s.st}},
+{t:'M1.4: Unary, assignment, conditional and comma operators',
+aim:'Aim: Understand a++ versus ++a, shortcut assignment, the ternary operator and the comma operator.',
+concept:'<p><b>Post-increment</b> <code>b = a++</code>: use the old value, then add 1. <b>Pre-increment</b> <code>c = ++a</code>: add 1 first, then use the new value.</p><p><b>Assignment shortcuts</b>: <code>a += 3</code> means <code>a = a + 3</code>. <b>Conditional</b>: <code>cond ? x : y</code>. <b>Comma</b>: <code>(e1, e2)</code> runs e1, then e2, and the value is e2. This type of tracing is a very common exam question.</p>',
+code:[H,M,'    int a = 5, b, c;','    b = a++;      // post-increment','    c = ++a;      // pre-increment','    a += 3;       // a = a + 3','    int max = (b > c) ? b : c;','    int x = (a = 1, a + 10);   // comma operator','    printf("a=%d b=%d c=%d max=%d x=%d\\n", a, b, c, max, x);','    return 0;','}'],
+inputs:[],
+run:()=>S([[2,'a starts at 5.','',{a:5}],[3,'Post-increment: b gets the OLD value 5, then a becomes 6.','',{b:5,a:6}],[4,'Pre-increment: a becomes 7 FIRST, then c gets 7.','',{a:7,c:7}],[5,'a += 3 means a = a + 3, so a = 10.','',{a:10}],[6,'Ternary: (5 > 7) is false, so max takes the second choice, c = 7.','',{max:7}],[7,'Comma operator: a = 1 runs first, then a + 10 = 11 is the value of the whole bracket, so x = 11.','',{a:1,x:11}],[8,'Prints the final values.','a=1 b=5 c=7 max=7 x=11\n'],[9,'Program ends.']])},
+{t:'M1.5: Bitwise operators',
+aim:'Aim: See & | ^ ~ << >> working on the binary bits of two numbers (0 to 255).',
+concept:'<p>Bitwise operators work on the individual bits of integers. <code>&amp;</code> (AND) gives 1 only if both bits are 1, <code>|</code> (OR) if at least one is 1, <code>^</code> (XOR) if the bits differ, <code>~</code> flips every bit.</p><p><code>a &lt;&lt; 1</code> shifts bits left (multiplies by 2). <code>a &gt;&gt; 1</code> shifts right (divides by 2, dropping the remainder). <code>~a</code> equals <code>-(a+1)</code>.</p>',
+code:[H,M,'    int a, b;','    scanf("%d %d", &a, &b);','    printf("a & b = %d\\n", a & b);','    printf("a | b = %d\\n", a | b);','    printf("a ^ b = %d\\n", a ^ b);','    printf("~a = %d\\n", ~a);','    printf("a << 1 = %d\\n", a << 1);','    printf("a >> 1 = %d\\n", a >> 1);','    return 0;','}'],
+inputs:[I('a','a (0-255)',12),I('b','b (0-255)',10)],
+run(x){const c=v=>Math.min(255,Math.max(0,parseInt(v)||0)),a=c(x.a),b=c(x.b),s=B();
+s.add(2,'Two int variables are declared.');
+s.add(3,'The numbers are stored. Their 8-bit binary forms are shown.',inp(a+' '+b),{a,b,'a bits':bin(a),'b bits':bin(b)});
+s.add(4,bin(a)+' & '+bin(b)+' = '+bin(a&b)+' (1 only where both are 1)','a & b = '+(a&b)+'\n');
+s.add(5,bin(a)+' | '+bin(b)+' = '+bin(a|b)+' (1 where either is 1)','a | b = '+(a|b)+'\n');
+s.add(6,bin(a)+' ^ '+bin(b)+' = '+bin(a^b)+' (1 where the bits differ)','a ^ b = '+(a^b)+'\n');
+s.add(7,'Every bit of a is flipped, which gives -(a + 1) = '+(~a),'~a = '+(~a)+'\n');
+s.add(8,'Shift left by 1: '+bin(a)+' becomes '+bin(a<<1).slice(-9)+', the same as a x 2.','a << 1 = '+(a<<1)+'\n');
+s.add(9,'Shift right by 1: the last bit falls off, the same as a / 2 (integer).','a >> 1 = '+(a>>1)+'\n');
+s.add(10,'Program ends.');return s.st}},
+{t:'M1.6: Input and output functions',
+aim:'Aim: Use getchar, putchar, scanf, printf, gets and puts, and see why a leftover Enter key causes trouble.',
+concept:'<p><code>getchar()</code> reads one character, <code>putchar(c)</code> prints one. <code>scanf</code> reads formatted values (numbers need <code>&amp;</code>), <code>printf</code> prints them. <code>gets(s)</code> reads a whole line (spaces included), <code>puts(s)</code> prints a string and adds a newline.</p><p>Warning: after you type a character and press Enter, the Enter key stays in the input buffer. A second <code>getchar()</code> removes it. <code>gets()</code> is unsafe and removed from newer C standards (real programs use <code>fgets</code>), but it is part of this syllabus.</p>',
+code:[H,M,'    char ch, name[20];','    int age;','    printf("Enter a character: ");','    ch = getchar();','    getchar();   // remove the Enter key left in the buffer','    putchar(ch);',"    putchar('\\n');",'    printf("Enter your name: ");','    gets(name);','    printf("Enter age: ");','    scanf("%d", &age);','    puts(name);','    printf("Age = %d\\n", age);','    return 0;','}'],
+inputs:[],
+run:()=>S([[2,'ch will hold one character. name is a character array that can hold a short string.'],[3,'age is an int.'],[4,'The prompt is printed.','Enter a character: '],[5,'getchar() reads one character. You typed R and pressed Enter: R goes into ch, and the Enter (newline) stays waiting in the buffer.',inp('R'),{ch:"'R'"}],[6,'This second getchar() throws away the leftover newline. Without it, gets() below would read an empty line.'],[7,'putchar prints exactly one character.','R'],[8,'Prints a newline character.','\n'],[9,'Prompt for the name.','Enter your name: '],[10,'gets reads the whole line until Enter, spaces included.',inp('Ravi'),{name:'"Ravi"'}],[11,'Prompt for the age.','Enter age: '],[12,'scanf reads a number and needs &age (the address).',inp(21),{age:21}],[13,'puts prints the string and adds a newline by itself.','Ravi\n'],[14,'printf prints text with the number.','Age = 21\n'],[15,'Program ends.']])}
+]});
+</script>
+</body>
+</html>

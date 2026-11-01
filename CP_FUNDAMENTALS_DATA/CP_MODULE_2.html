@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>CP_MODULE 2</title></head>
+<body>
+<div id="app"></div>
+<script src="trace_engine.js"></script>
+<script>
+TR.mount({n:2,title:'Control Structures',sub:'5 hours | LO3 | Decisions, loops, nested control, switch, break, continue and goto.',
+topics:['2.1 Branching: if statement, if-else statement, multiway decision (else-if ladder)','2.2 Looping: while, do-while, for','2.3 Nested control structure: switch statement, continue statement, break statement, goto statement'],
+ex:[
+{t:'M2.1: if and if-else',
+aim:'Aim: See how an if-else picks one of two paths, and how an if without else is simply skipped.',
+concept:'<p><code>if (condition) { ... }</code> runs its block only when the condition is true (non-zero). Adding <code>else</code> gives a second path for the false case. An <code>if</code> with no <code>else</code> does nothing when false.</p><p>Here <code>n % 2 == 0</code> tests for an even number (remainder 0 after dividing by 2).</p>',
+code:[H,M,'    int n;','    printf("Enter n: ");','    scanf("%d", &n);','    if (n % 2 == 0)','        printf("Even\\n");','    else','        printf("Odd\\n");','    if (n > 0)','        printf("Positive\\n");','    return 0;','}'],
+inputs:[I('n','n',7)],
+run(x){const v=parseInt(x.n)||0,s=B(),ev=v%2===0;
+s.add(2,'n is declared.');s.add(3,'The prompt is printed.','Enter n: ');s.add(4,'n = '+v,inp(v),{n:v});
+s.add(5,'Check: '+v+' % 2 == 0 is '+ev+'.');
+if(ev)s.add(6,'True, so the if block runs.','Even\n');else{s.add(7,'False, so control jumps to the else part.');s.add(8,'The else block runs.','Odd\n')}
+s.add(9,'A separate if with no else: check '+v+' > 0 is '+(v>0)+'.');
+if(v>0)s.add(10,'True, so it prints.','Positive\n');
+s.add(11,(v>0?'':'The second if was false and has no else, so it was skipped. ')+'Program ends.');return s.st}},
+{t:'M2.2: Multiway decision (else-if ladder)',
+aim:'Aim: Classify a triangle. Conditions are tested top to bottom and only the first true branch runs.',
+concept:'<p>An <b>else-if ladder</b> chooses one branch out of many. As soon as one condition is true, the rest of the ladder is skipped. The final <code>else</code> catches everything that did not match.</p><p>Order matters: the strictest test (all sides equal) must come first. Try 5 5 5, then 5 5 8, then 3 4 5.</p>',
+code:[H,M,'    int a, b, c;','    printf("Enter three sides: ");','    scanf("%d %d %d", &a, &b, &c);','    if (a == b && b == c)','        printf("Equilateral\\n");','    else if (a == b || b == c || a == c)','        printf("Isosceles\\n");','    else','        printf("Scalene\\n");','    return 0;','}'],
+inputs:[I('a','a',5),I('b','b',5),I('c','c',8)],
+run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0,c=parseInt(x.c)||0,s=B();
+s.add(2,'Three int variables are declared.');s.add(3,'The prompt is printed.','Enter three sides: ');s.add(4,'The sides are stored.',inp(a+' '+b+' '+c),{a,b,c});
+const eq=a===b&&b===c,iso=a===b||b===c||a===c;
+s.add(5,'Check a == b && b == c: '+(a===b)+' and '+(b===c)+' gives '+eq+'.');
+if(eq)s.add(6,'True, so this branch runs and the rest of the ladder is skipped.','Equilateral\n');
+else{s.add(7,'Check a == b || b == c || a == c: gives '+iso+'.');
+ if(iso)s.add(8,'True, so this branch runs.','Isosceles\n');
+ else{s.add(9,'No condition matched, so else runs.');s.add(10,'All sides differ.','Scalene\n')}}
+s.add(11,'Program ends. (Real code should also check that the sides can form a triangle.)');return s.st}},
+{t:'M2.3: while loop (reverse a number)',
+aim:'Aim: Reverse the digits of a number using a while loop.',
+concept:'<p>A <b>while</b> loop checks the condition <i>before</i> each pass, so it may run zero times. Inside, something must change (here <code>n = n / 10</code>) or the loop never ends.</p><p><code>n % 10</code> is the last digit. <code>rev * 10 + digit</code> appends that digit to the answer, which reverses the number.</p>',
+code:[H,M,'    int n, rev = 0;','    printf("Enter n: ");','    scanf("%d", &n);','    while (n > 0) {','        rev = rev * 10 + n % 10;','        n = n / 10;','    }','    printf("Reversed = %d\\n", rev);','    return 0;','}'],
+inputs:[I('n','n (1 to 99999)',1234)],
+run(x){const v=Math.min(99999,Math.max(1,parseInt(x.n)||1)),s=B();let m=v,rev=0;
+s.add(2,'rev starts at 0.','',{rev:0});s.add(3,'The prompt is printed.','Enter n: ');s.add(4,'n = '+v,inp(v),{n:v});
+while(m>0){s.add(5,'Check '+m+' > 0 is true.');const d=m%10,o=rev;rev=rev*10+d;
+ s.add(6,'rev = '+o+' x 10 + '+d+' = '+rev,'',{rev});m=Math.floor(m/10);s.add(7,'n = n / 10 = '+m,'',{n:m})}
+s.add(5,'Check '+m+' > 0 is false, so the loop ends.');s.add(9,'Prints the reversed number.','Reversed = '+rev+'\n');s.add(10,'Program ends.');return s.st}},
+{t:'M2.4: for loop (sum of first n numbers)',
+aim:'Aim: See the three parts of a for loop: initialise, condition, update.',
+concept:'<p><code>for (i = 1; i &lt;= n; i++)</code> packs three parts in one line: <b>initialise</b> (once at the start), <b>condition</b> (checked before every pass) and <b>update</b> (runs after every pass). Use for when you know how many times to repeat.</p>',
+code:[H,M,'    int n, i, sum = 0;','    printf("Enter n: ");','    scanf("%d", &n);','    for (i = 1; i <= n; i++)','        sum += i;','    printf("Sum = %d\\n", sum);','    return 0;','}'],
+inputs:[I('n','n (1 to 8)',5)],
+run(x){const v=Math.min(8,Math.max(1,parseInt(x.n)||1)),s=B();let sum=0;
+s.add(2,'sum starts at 0.','',{sum:0});s.add(3,'The prompt is printed.','Enter n: ');s.add(4,'n = '+v,inp(v),{n:v});
+for(let i=1;i<=v;i++){s.add(5,(i===1?'Initialise i = 1. ':'Update: i++ gives i = '+i+'. ')+'Check '+i+' <= '+v+' is true.','',{i});sum+=i;s.add(6,'sum = '+sum,'',{sum})}
+s.add(5,'i becomes '+(v+1)+'. Check is false, so the loop ends.','',{i:v+1});s.add(7,'Prints the sum.','Sum = '+sum+'\n');s.add(8,'Program ends.');return s.st}},
+{t:'M2.5: do-while loop (body runs at least once)',
+aim:'Aim: Prove that a do-while body always runs once, even when the condition is false from the start.',
+concept:'<p>A <b>do-while</b> loop is <i>exit-controlled</i>: the body runs first, then the condition is checked. So the body always runs <b>at least once</b>. A while loop checks first and may not run at all.</p><p>Syntax needs a semicolon after the condition: <code>} while (n &gt; 5);</code>. Try n = 3 (condition false at once) and n = 8.</p>',
+code:[H,M,'    int n;','    printf("Enter n: ");','    scanf("%d", &n);','    do {','        printf("n = %d\\n", n);','        n--;','    } while (n > 5);','    return 0;','}'],
+inputs:[I('n','n (1 to 12)',3)],
+run(x){let v=Math.min(12,Math.max(1,parseInt(x.n)||1)),s=B(),c,first=true,v0=v;
+s.add(2,'n is declared.');s.add(3,'The prompt is printed.','Enter n: ');s.add(4,'n = '+v,inp(v),{n:v});
+do{s.add(5,first&&v0<=5?'Enter the body. Even though n > 5 is false, nothing is checked yet, so the body runs once.':'Enter the body (no check yet).');first=false;
+ s.add(6,'Prints n.','n = '+v+'\n');v--;s.add(7,'n-- makes n = '+v,'',{n:v});c=v>5;s.add(8,'Check '+v+' > 5 is '+c+(c?', so repeat.':', so the loop stops.'))}while(c);
+s.add(9,'Program ends.');return s.st}},
+{t:'M2.6: Nested loops (star pattern)',
+aim:'Aim: Print an inverted triangle of stars using a loop inside a loop.',
+concept:'<p>A <b>nested loop</b> is a loop inside another loop. The outer loop (<code>i</code>) counts rows. The inner loop (<code>j</code>) runs completely for every single pass of the outer loop and prints the stars of that row.</p><p>Row 1 prints <code>rows</code> stars, row 2 prints one less, and so on, because the inner condition is <code>j &lt;= rows - i + 1</code>. <code>printf("\\n")</code> ends the row.</p>',
+code:[H,M,'    int rows, i, j;','    printf("Enter rows: ");','    scanf("%d", &rows);','    for (i = 1; i <= rows; i++) {','        for (j = 1; j <= rows - i + 1; j++)','            printf("*");','        printf("\\n");','    }','    return 0;','}'],
+inputs:[I('r','Rows (1 to 6)',4)],
+run(x){const r=Math.min(6,Math.max(1,parseInt(x.r)||1)),s=B();
+s.add(2,'Three int variables are declared.');s.add(3,'The prompt is printed.','Enter rows: ');s.add(4,'rows = '+r,inp(r),{rows:r});
+for(let i=1;i<=r;i++){const c=r-i+1;s.add(5,'Outer loop: i = '+i+'. This row needs '+c+' stars.','',{i});
+ for(let j=1;j<=c;j++){s.add(6,'Inner loop: j = '+j+', check '+j+' <= '+c+' is true.','',{j});s.add(7,'Prints one star.','*')}
+ s.add(6,'j becomes '+(c+1)+'. Check is false, so the inner loop ends.','',{j:c+1});s.add(8,'Row done, move to the next line.','\n')}
+s.add(5,'i becomes '+(r+1)+'. Check is false, so the outer loop ends.','',{i:r+1});s.add(10,'Program ends.');return s.st}},
+{t:'M2.7: switch statement (with fall-through)',
+aim:'Aim: See how switch jumps to a case, why break matters, and how cases can share code.',
+concept:'<p><code>switch (value)</code> jumps straight to the matching <code>case</code> label. Execution then continues downward until a <code>break</code> is met. Without <code>break</code> it <b>falls through</b> into the next case. That is useful on purpose: cases 1, 3 and 5 share one printf here. <code>default</code> runs when nothing matches.</p><p>Try months 1, 3, 4, 2 and 9.</p>',
+code:[H,M,'    int month;','    printf("Enter month (1-6): ");','    scanf("%d", &month);','    switch (month) {','        case 1:','        case 3:','        case 5:  printf("31 days\\n"); break;','        case 4:','        case 6:  printf("30 days\\n"); break;','        case 2:  printf("28 or 29 days\\n"); break;','        default: printf("Invalid month\\n");','    }','    return 0;','}'],
+inputs:[I('m','Month',3)],
+run(x){const m=parseInt(x.m)||0,s=B();
+s.add(2,'month is declared.');s.add(3,'The prompt is printed.','Enter month (1-6): ');s.add(4,'month = '+m,inp(m),{month:m});
+s.add(5,'switch compares month = '+m+' with the case labels and jumps to the match.');
+const F={1:[6,7,8],3:[7,8],5:[8],4:[9,10],6:[10],2:[11]}[m];
+if(F){F.forEach((l,i)=>{const last=i===F.length-1;
+ if(!last)s.add(l,(i===0?'case '+m+' matches. ':'')+'There is no statement or break here, so execution FALLS THROUGH to the next line.');
+ else{const t=l===11?'28 or 29 days':(l===8?'31 days':'30 days');s.add(l,(i===0?'case '+m+' matches. ':'Falls through to here. ')+'The statement runs.',t+'\n');s.add(l,'break leaves the switch.')}})}
+else s.add(12,'No case matches, so default runs.','Invalid month\n');
+s.add(14,'Program ends.');return s.st}},
+{t:'M2.8: break, continue and goto',
+aim:'Aim: Trace how continue skips one pass, break leaves a loop, and goto jumps to a label.',
+concept:'<p><code>continue</code> skips the rest of the current pass and goes to the next one (in a for loop, to the update <code>i++</code>). <code>break</code> leaves the loop (or switch) immediately. <code>goto label;</code> jumps to a named label in the same function.</p><p><code>goto</code> is rarely used because it makes code hard to follow, but it is in the syllabus and appears in tracing questions.</p>',
+code:[H,M,'    int i;','    for (i = 1; i <= 6; i++) {','        if (i == 2)','            continue;','        if (i == 5)','            break;','        printf("i = %d\\n", i);','    }','    goto done;','    printf("This line is skipped\\n");','done:','    printf("Jumped to done\\n");','    return 0;','}'],
+inputs:[],
+run(){const s=B();s.add(2,'i is declared.');
+for(let i=1;i<=5;i++){s.add(3,(i===1?'Initialise i = 1. ':'Update: i++ gives i = '+i+'. ')+'Check i <= 6 is true.','',{i});
+ s.add(4,'Check i == 2: '+(i===2)+'.');
+ if(i===2){s.add(5,'continue skips the rest of this pass and jumps to the update part. Nothing is printed for i = 2.');continue}
+ s.add(6,'Check i == 5: '+(i===5)+'.');
+ if(i===5){s.add(7,'break leaves the loop at once, although i <= 6 is still true.');break}
+ s.add(8,'Prints i.','i = '+i+'\n')}
+s.add(10,'goto done jumps straight to the label done.');s.add(12,'The printf on the line in between was skipped. Execution continues after the label.');s.add(13,'Prints the message.','Jumped to done\n');s.add(14,'Program ends.');return s.st}}
+]});
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>CP_MODULE 4</title></head>
+<body>
+<div id="app"></div>
+<script src="trace_engine.js"></script>
+<script>
+TR.mount({n:4,title:'Arrays, String, Structure',sub:'5 hours | LO4 | One and two dimensional arrays, strings and string.h, structures and arrays of structures.',
+topics:['4.1 Array: concepts, declaration, definition, accessing an array element, one-dimensional and multidimensional array','4.2 String: basic of string, functions in string.h, array of strings','4.3 Structure: declaration, initialization, structure within structure, operation on structures, array of structures'],
+ex:[
+{t:'M4.1: One-dimensional array (sum and maximum)',
+aim:'Aim: Access array elements by index and scan the array with a for loop.',
+concept:'<p>An <b>array</b> stores many values of the same type in consecutive memory. <code>int arr[5]</code> makes 5 boxes with indexes <b>0 to 4</b>. <code>arr[i]</code> accesses one element. Going outside (like <code>arr[5]</code>) is a bug that C does not stop.</p><p>The loop keeps a running <code>sum</code> and a <code>max</code> that is updated whenever a bigger element appears.</p>',
+code:[H,M,'    int arr[5] = {4, 9, 2, 7, 5};','    int i, sum = 0, max = arr[0];','    for (i = 0; i < 5; i++) {','        sum += arr[i];','        if (arr[i] > max)','            max = arr[i];','    }','    printf("Sum = %d, Max = %d\\n", sum, max);','    return 0;','}'],
+inputs:[],
+run(){const a=[4,9,2,7,5],s=B();let sum=0,max=4;
+s.add(2,'An array of 5 ints. Indexes run from 0 to 4.','',{arr:'[4, 9, 2, 7, 5]'});
+s.add(3,'sum starts at 0 and max starts as the first element, arr[0] = 4.','',{sum:0,max:4});
+for(let i=0;i<5;i++){s.add(4,(i===0?'Initialise i = 0. ':'Update: i++ gives i = '+i+'. ')+'Check '+i+' < 5 is true.','',{i});
+ sum+=a[i];s.add(5,'sum += arr['+i+'] ('+a[i]+') gives '+sum,'',{sum});
+ const big=a[i]>max;s.add(6,'Check arr['+i+'] > max: '+a[i]+' > '+max+' is '+big+'.');
+ if(big){max=a[i];s.add(7,'max = '+max,'',{max})}}
+s.add(4,'i becomes 5. Check 5 < 5 is false, so the loop ends.','',{i:5});
+s.add(9,'Prints the result.','Sum = '+sum+', Max = '+max+'\n');s.add(10,'Program ends.');return s.st}},
+{t:'M4.2: Two-dimensional array (row sums)',
+aim:'Aim: Access m[i][j] (row i, column j) using nested loops.',
+concept:'<p>A <b>2-D array</b> is a table: <code>int m[2][3]</code> has 2 rows and 3 columns. <code>m[i][j]</code> is the element in row <code>i</code>, column <code>j</code>, both starting at 0. A nested loop visits every element: the outer loop walks the rows, the inner loop walks the columns of that row.</p>',
+code:[H,M,'    int m[2][3] = {{1, 2, 3}, {4, 5, 6}};','    int i, j, rowSum;','    for (i = 0; i < 2; i++) {','        rowSum = 0;','        for (j = 0; j < 3; j++)','            rowSum += m[i][j];','        printf("Row %d sum = %d\\n", i, rowSum);','    }','    return 0;','}'],
+inputs:[],
+run(){const m=[[1,2,3],[4,5,6]],s=B();
+s.add(2,'A table with 2 rows and 3 columns.','',{m:'[[1,2,3],[4,5,6]]'});
+for(let i=0;i<2;i++){s.add(4,'Outer loop: i = '+i+' (row '+i+').','',{i});s.add(5,'rowSum is reset to 0 for each row.','',{rowSum:0});let r=0;
+ for(let j=0;j<3;j++){s.add(6,'Inner loop: j = '+j+' (column '+j+').','',{j});r+=m[i][j];s.add(7,'rowSum += m['+i+']['+j+'] ('+m[i][j]+') gives '+r,'',{rowSum:r})}
+ s.add(8,'Prints the sum of this row.','Row '+i+' sum = '+r+'\n')}
+s.add(10,'Program ends.');return s.st}},
+{t:'M4.3: Strings and array of strings',
+aim:'Aim: Understand that a string is a char array ending with the NUL character, and find its length by hand.',
+concept:'<p>A <b>string</b> in C is an array of <code>char</code> that ends with the special character <code>\\0</code> (NUL). <code>"HELLO"</code> needs 6 bytes: 5 letters plus NUL. Functions such as printf with <code>%s</code> read characters until they meet NUL.</p><p>An <b>array of strings</b> is a 2-D char array: <code>char names[3][6]</code> holds three names of up to 5 letters each.</p>',
+code:[H,M,'    char word[] = "HELLO";','    char names[3][6] = {"Ann", "Bob", "Cy"};','    int len = 0, i;',"    while (word[len] != '\\0')",'        len++;','    printf("Length = %d\\n", len);','    for (i = 0; i < 3; i++)','        printf("%s\\n", names[i]);','    return 0;','}'],
+inputs:[],
+run(){const w='HELLO',nm=['Ann','Bob','Cy'],s=B();
+s.add(2,'"HELLO" is stored as 6 characters: five letters plus the end marker NUL that C adds for you.','',{word:'H E L L O NUL'});
+s.add(3,'names is an array of 3 strings. Each row has room for 5 letters plus NUL.','',{names:'Ann, Bob, Cy'});
+s.add(4,'len starts at 0.','',{len:0});
+for(let l=0;l<=5;l++){s.add(5,'Check word['+l+'] != NUL: '+(l<5?"'"+w[l]+"' is not NUL, so true.":'it is NUL, so false and the loop stops.'));if(l<5)s.add(6,'len++ gives '+(l+1),'',{len:l+1})}
+s.add(7,'The length does not count the NUL.','Length = 5\n');
+for(let i=0;i<3;i++){s.add(8,'i = '+i,'',{i});s.add(9,'%s prints the characters of names['+i+'] up to its NUL.',nm[i]+'\n')}
+s.add(8,'i becomes 3, the loop ends.','',{i:3});s.add(10,'Program ends.');return s.st}},
+{t:'M4.4: Functions in string.h',
+aim:'Aim: Use strcpy, strcat, strlen and strcmp.',
+concept:'<p>Include <code>&lt;string.h&gt;</code> for ready-made string functions. <code>strlen(s)</code> counts characters before NUL. <code>strcpy(dest, src)</code> copies src into dest. <code>strcat(dest, src)</code> appends src to the end of dest (dest must have enough room). <code>strcmp(s1, s2)</code> returns 0 if equal, a negative number if s1 is smaller (alphabetically) and a positive number if s1 is larger. Never compare strings with <code>==</code>.</p>',
+code:[H,'#include <string.h>',M,'    char a[20] = "Good";','    char b[20];','    strcpy(b, "Day");','    strcat(a, b);','    printf("%s has length %zu\\n", a, strlen(a));','    printf("compare = %d\\n", strcmp("abc", "abd"));','    return 0;','}'],
+inputs:[],
+run:()=>S([[3,'a holds "Good" and has room for 20 characters.','',{a:'Good'}],[4,'b is created but holds no meaningful text yet.'],[5,'strcpy(b, "Day") copies the text (and its NUL) into b.','',{b:'Day'}],[6,'strcat(a, b) appends b to the end of a.','',{a:'GoodDay'}],[7,'strlen counts the characters before NUL: 7.','GoodDay has length 7\n'],[8,'"abc" and "abd" first differ at the last letter, and c comes before d. So strcmp returns a negative number (commonly -1).','compare = -1\n'],[9,'Program ends.']])},
+{t:'M4.5: Structure, initialisation and structure within structure',
+aim:'Aim: Group different types in one structure, access members with the dot operator, and nest one structure inside another.',
+concept:'<p>A <b>structure</b> groups related variables of different types under one name. <code>struct Student</code> is only a <i>blueprint</i>: no memory is used until you create a variable. Access members with the <b>dot operator</b>: <code>s.id</code>. A structure can contain another structure (<b>nested</b>), reached with two dots: <code>s.dob.y</code>. You can initialise with braces in member order.</p>',
+code:[H,'struct Date {','    int d, m, y;','};','struct Student {','    int id;','    float marks;','    struct Date dob;     // structure within structure','};',M,'    struct Student s = {101, 88.5, {15, 8, 2005}};','    s.marks = s.marks + 1.5;','    printf("ID %d, marks %.1f\\n", s.id, s.marks);','    printf("DOB %d/%d/%d\\n", s.dob.d, s.dob.m, s.dob.y);','    return 0;','}'],
+inputs:[],
+run:()=>S([[1,'struct Date is a blueprint with three ints. No memory is used yet.'],[4,'struct Student is another blueprint. It contains a struct Date member.'],[10,'Now a real variable s is created and filled in member order. The inner braces fill dob.','',{'s.id':101,'s.marks':88.5,'s.dob':'15/8/2005'}],[11,'Members are changed with the dot operator: 88.5 + 1.5 = 90.0','',{'s.marks':'90.0'}],[12,'Prints id and marks.','ID 101, marks 90.0\n'],[13,'s.dob.d, s.dob.m, s.dob.y reach inside the nested structure.','DOB 15/8/2005\n'],[14,'Program ends.']])},
+{t:'M4.6: Array of structures',
+aim:'Aim: Store several records in an array of structures and find the topper.',
+concept:'<p>An <b>array of structures</b> stores many records of the same type, like rows of a table. <code>st[i].marks</code> means: take element <code>i</code> of the array, then its <code>marks</code> member. Loops walk through the records exactly as for a normal array.</p>',
+code:[H,'struct Student {','    int id;','    int marks;','};',M,'    struct Student st[3] = {{1, 70}, {2, 85}, {3, 60}};','    int i, best = 0;','    for (i = 1; i < 3; i++)','        if (st[i].marks > st[best].marks)','            best = i;','    printf("Topper: id %d with %d marks\\n", st[best].id, st[best].marks);','    return 0;','}'],
+inputs:[],
+run(){const m=[70,85,60],s=B();let best=0;
+s.add(6,'Three records: (id 1, 70), (id 2, 85), (id 3, 60).','',{st:'[1:70, 2:85, 3:60]'});
+s.add(7,'best holds the INDEX of the best record so far. It starts at 0.','',{best:0});
+for(let i=1;i<3;i++){s.add(8,(i===1?'Initialise i = 1. ':'Update: i++ gives i = '+i+'. ')+'Check '+i+' < 3 is true.','',{i});
+ const b=m[i]>m[best];s.add(9,'Check st['+i+'].marks > st['+best+'].marks: '+m[i]+' > '+m[best]+' is '+b+'.');
+ if(b){best=i;s.add(10,'best = '+i,'',{best})}}
+s.add(8,'i becomes 3. Check is false, so the loop ends.','',{i:3});
+s.add(11,'Prints the id and marks of the record at index best.','Topper: id '+(best+1)+' with '+m[best]+' marks\n');s.add(12,'Program ends.');return s.st}}
+]});
+</script>
+</body>
+</html>

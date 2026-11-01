@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CP_FUNDAMENTALS - DS_TRACE LAB</title>
+<style>
+:root{--bg:#f3f5f2;--panel:#fff;--ink:#17211b;--mute:#5d6b62;--line:#d5dcd6;--acc:#0f7a55;--accsoft:#dff3ea}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1310;--panel:#151d18;--ink:#e6efe9;--mute:#93a39a;--line:#26332b;--acc:#3ddc97;--accsoft:#173326}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 Georgia,'Times New Roman',serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+header{padding:26px 20px 10px;max-width:1100px;margin:0 auto}
+.brand{font:700 15px 'Cascadia Code',Consolas,monospace;color:var(--acc)}
+h1{margin:4px 0 4px;font-size:clamp(28px,6vw,44px);line-height:1.12}
+.sub{color:var(--mute);margin:0;max-width:760px}
+main{max-width:1100px;margin:0 auto;padding:10px 20px 40px}
+.how{background:var(--accsoft);border-radius:12px;padding:12px 16px;margin:12px 0 20px}
+.how b{color:var(--acc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
+a.box{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;color:inherit;text-decoration:none;border-top:5px solid var(--acc)}
+a.box:hover{border-color:var(--acc)}
+a.box:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+.num{font:700 13px 'Cascadia Code',Consolas,monospace;color:var(--acc)}
+.box h2{margin:0;font-size:22px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;font-size:12.5px}
+.meta span{background:var(--accsoft);border-radius:99px;padding:1px 10px}
+.box ul{margin:4px 0 6px;padding-left:18px;color:var(--mute);font-size:14.5px}
+.go{margin-top:auto;font-weight:700;color:var(--acc)}
+.tree{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-top:22px;font:13.5px/1.6 'Cascadia Code',Consolas,monospace;white-space:pre;overflow-x:auto}
+.note{font-size:13px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">DS_TRACE LAB</div>
+  <h1>CP_FUNDAMENTALS</h1>
+  <p class="sub">Fundamentals of C programming, module by module. Every module has basic concepts and step-by-step tracing programs you can run, step through and re-run with your own inputs.</p>
+</header>
+<main>
+  <div class="how"><b>How to use:</b> click a module box, pick a program number, read the basic concept, then press <b>Next</b> to watch each line run. Change the inputs and trace again. Yellow text in the console is what the user types.</div>
+  <div class="grid">
+    <a class="box" href="CP_FUNDAMENTALS_DATA/CP_MODULE_1.html"><span class="num">CP_MODULE 1</span><h2>Fundamentals of C-Programming</h2>
+      <div class="meta"><span>6 hrs</span><span>LO1, LO2</span><span>6 programs</span></div>
+      <ul><li>Data types, constants, variables</li><li>All operators (arithmetic to bitwise)</li><li>printf, scanf, getchar, putchar, gets, puts</li><li>Structure of C, preprocessor</li></ul><span class="go">Open module 1 &rarr;</span></a>
+    <a class="box" href="CP_FUNDAMENTALS_DATA/CP_MODULE_2.html"><span class="num">CP_MODULE 2</span><h2>Control Structures</h2>
+      <div class="meta"><span>5 hrs</span><span>LO3</span><span>8 programs</span></div>
+      <ul><li>if, if-else, else-if ladder</li><li>while, do-while, for, nested loops</li><li>switch, break, continue, goto</li></ul><span class="go">Open module 2 &rarr;</span></a>
+    <a class="box" href="CP_FUNDAMENTALS_DATA/CP_MODULE_3.html"><span class="num">CP_MODULE 3</span><h2>Functions and Parameter</h2>
+      <div class="meta"><span>5 hrs</span><span>LO3</span><span>4 programs</span></div>
+      <ul><li>Define, declare (prototype) and call</li><li>Passing arguments, recursion</li><li>auto, extern, static, register</li></ul><span class="go">Open module 3 &rarr;</span></a>
+    <a class="box" href="CP_FUNDAMENTALS_DATA/CP_MODULE_4.html"><span class="num">CP_MODULE 4</span><h2>Arrays, String, Structure</h2>
+      <div class="meta"><span>5 hrs</span><span>LO4</span><span>6 programs</span></div>
+      <ul><li>1-D and 2-D arrays</li><li>Strings, string.h, array of strings</li><li>Structures, nested structures, array of structures</li></ul><span class="go">Open module 4 &rarr;</span></a>
+    <a class="box" href="CP_FUNDAMENTALS_DATA/CP_MODULE_5.html"><span class="num">CP_MODULE 5</span><h2>Pointer</h2>
+      <div class="meta"><span>3 hrs</span><span>LO5</span><span>4 programs</span></div>
+      <ul><li>Address operator, dereferencing</li><li>Pointer arithmetic, pointers and arrays</li><li>Void pointer, pointer to pointer</li></ul><span class="go">Open module 5 &rarr;</span></a>
+    <a class="box" href="CP_FUNDAMENTALS_DATA/CP_MODULE_6.html"><span class="num">CP_MODULE 6</span><h2>Files</h2>
+      <div class="meta"><span>2 hrs</span><span>LO6</span><span>3 programs</span></div>
+      <ul><li>Open, close, create (fopen, fclose)</li><li>Read and process (fgetc, fscanf)</li><li>Write and append (fprintf, fputs)</li></ul><span class="go">Open module 6 &rarr;</span></a>
+  </div>
+  <div class="tree" aria-label="Folder structure">CP_FUNDAMENTALS.html
+CP_FUNDAMENTALS_DATA/
+  trace_engine.js      (shared tracer, keep it in this folder)
+  CP_MODULE_1.html
+  CP_MODULE_2.html
+  CP_MODULE_3.html
+  CP_MODULE_4.html
+  CP_MODULE_5.html
+  CP_MODULE_6.html</div>
+  <p class="note">Keep the folder structure as shown so the links work. Open CP_FUNDAMENTALS.html in any browser.</p>
+</main>
+</body>
+</html>
