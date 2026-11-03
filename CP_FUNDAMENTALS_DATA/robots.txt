@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Ensure search engine bots can access all images and favicons
+User-agent: Googlebot-Image
+Allow: /
+
+# Direct search engine crawlers to your sitemap
+Sitemap: https://vivek-22.tech/sitemap.xml
