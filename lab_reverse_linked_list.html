@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DS_TRACE LAB – Reversing a Singly Linked List</title>
+<style>
+:root{box-sizing:border-box;--bg:#f6f7f9;--fg:#1c2230;--mut:#6b7385;--card:#fff;--bd:#dde1ea;--acc:#2f6fed;--cur:#fff3bf;--fn:#eef3ff;--ok:#1f9d55;--code:#fbfbfd;--bad:#d9480f}
+@media (prefers-color-scheme:dark){:root{--bg:#12151c;--fg:#e6e9f0;--mut:#98a1b5;--card:#1b2030;--bd:#2d3447;--acc:#6b9cff;--cur:#4a4120;--fn:#1d2740;--ok:#4cc38a;--code:#171b27;--bad:#ff9a62}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.top{max-width:1150px;margin:0 auto 10px}
+.brand{font:700 13px ui-monospace,Menlo,Consolas,monospace;color:var(--acc)}
+h1{font-size:20px;margin:2px 0 8px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav a{padding:4px 12px;border:1px solid var(--bd);border-radius:99px;color:var(--mut);text-decoration:none;font-size:13px;background:var(--card)}
+nav a.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:12px;max-width:1150px;margin:auto}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.card h2{font-size:13px;color:var(--mut);margin:0 0 8px;font-weight:700}
+.card p{margin:4px 0}
+#code{font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--code);max-height:58vh;overflow:auto;border-radius:8px;border:1px solid var(--bd)}
+.ln{display:flex;white-space:pre;padding:0 8px}
+.ln i{width:30px;flex:none;color:var(--mut);font-style:normal;user-select:none}
+.ln.fn{background:var(--fn)}.ln.cur{background:var(--cur);box-shadow:inset 3px 0 var(--acc);font-weight:600}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+button,select{font:inherit;padding:6px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}button:disabled{opacity:.4;cursor:default}
+button:focus-visible,select:focus-visible,input:focus-visible,nav a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#cnt{color:var(--mut);font-size:13px;margin-left:auto}
+#msg{font-size:15px;margin:0 0 6px}#op{font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--ok);margin:0;min-height:20px}
+.col{display:flex;flex-direction:column;gap:12px}
+#heap{display:flex;flex-wrap:wrap;align-items:flex-end;gap:2px;min-height:96px;padding:4px 0}
+.nd{text-align:center}
+.pl{min-height:22px;display:flex;gap:3px;justify-content:center}
+.pl u{text-decoration:none;font:600 11px ui-monospace,monospace;background:var(--acc);color:#fff;border-radius:4px;padding:1px 6px}
+.bx{display:flex;border:2px solid var(--acc);border-radius:7px;overflow:hidden;font:600 13px ui-monospace,monospace;background:var(--fn)}
+.bx span{padding:5px 8px;min-width:46px}.bx span+span{border-left:2px solid var(--acc);color:var(--mut);font-size:11px;display:flex;align-items:center;justify-content:center;max-width:62px}
+.nd.hi .bx{background:var(--cur);border-color:#e0a800}
+.nd small{font:11px ui-monospace,monospace;color:var(--mut)}
+.ar{font:700 18px ui-monospace,monospace;color:var(--acc);padding:0 3px 22px}
+.ar.no{color:var(--mut);opacity:.4}
+.nl{font:600 12px ui-monospace,monospace;color:var(--mut);padding:0 4px 22px}
+.vars{font:13px ui-monospace,monospace;margin-top:8px;display:flex;gap:6px 14px;flex-wrap:wrap}
+.vars b{color:var(--acc)}.vars em{color:var(--bad);font-style:normal}
+#fr div{font:13px ui-monospace,monospace;padding:3px 8px;border:1px solid var(--bd);border-radius:6px;margin-bottom:3px}
+#fr div:first-child{background:var(--fn);border-color:var(--acc)}
+#out{margin:0;font:13px ui-monospace,monospace;min-height:48px;white-space:pre-wrap;background:#0d1117;color:#7ee787;padding:8px;border-radius:8px}
+.concept{max-width:1150px;margin:0 auto 12px}
+.legend{font-size:12px;color:var(--mut);margin-top:6px}
+</style></head><body>
+<div class="top"><div class="brand">DS_TRACE LAB</div><h1>Reversing a Singly Linked List</h1><nav aria-label="Experiments"><a href="lab_stack_linked_list.html">1. Stack (Linked List)</a><a href="lab_queue_linked_list.html">2. Queue (Linked List)</a><a href="lab_reverse_linked_list.html" class="on" aria-current="page">3. Reverse Linked List</a></nav></div>
+<div class="card concept"><h2>Basic concept</h2><p>A <b>singly linked list</b> node only knows the node after it. To <b>reverse</b> the list we do not move any data. We only flip every <code>next</code> pointer to point backwards, using three helper pointers: <code>prev</code> (node behind), <code>curr</code> (node being fixed) and <code>next</code> (saved so we do not lose the rest of the list).</p><p>Each loop does 4 things: save next, flip the link, move prev forward, move curr forward. At the end <code>prev</code> is the old last node, so it becomes the new <code>head</code>. Time O(n), extra space O(1).</p></div>
+<div class="grid">
+ <div class="col">
+  <div class="card"><h2>Source code <span id="where"></span></h2><div id="code"></div>
+   <div class="ctrl"><button id="pv">Back</button><button id="nx" class="p">Next</button><button id="au">Auto play</button><button id="rs">Reset</button>
+   <label style="font-size:13px;color:var(--mut)">Speed <select id="sp"><option value="1800">Slow</option><option value="1100" selected>Normal</option><option value="500">Fast</option></select></label><span id="cnt"></span></div>
+   <input id="sl" type="range" min="0" value="0" style="width:100%;margin-top:8px" aria-label="Step">
+   <div class="legend">Keyboard: left and right arrow keys step through the program.</div></div>
+ </div>
+ <div class="col">
+  <div class="card"><h2>What happens on this line</h2><p id="msg"></p><p id="op"></p></div>
+  <div class="card"><h2>Heap memory: each node is [ data | next ]</h2><div id="heap"></div><div class="vars" id="vars"></div></div>
+  <div class="card"><h2>Call stack (top = running function)</h2><div id="fr"></div></div>
+  <div class="card"><h2>Console output</h2><pre id="out"></pre></div>
+ </div>
+</div>
+<script>
+const raw=`#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+struct Node *head = NULL;
+
+void insertEnd(int value) {
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));§i_m
+    newNode->data = value;§i_d
+    newNode->next = NULL;§i_n
+    if (head == NULL) {§i_c
+        head = newNode;§i_h
+    } else {
+        struct Node *temp = head;§i_t
+        while (temp->next != NULL) {§i_w
+            temp = temp->next;§i_a
+        }
+        temp->next = newNode;§i_l
+    }
+}§i_e
+
+void display() {
+    struct Node *temp = head;§ds_t
+    if (temp == NULL) {§ds_c
+        printf("List is empty\\n");§ds_e
+        return;
+    }
+    printf("List: ");§ds_h
+    while (temp != NULL) {§ds_w
+        printf("%d -> ", temp->data);§ds_p
+        temp = temp->next;§ds_a
+    }
+    printf("NULL\\n");§ds_n
+}§ds_x
+
+void reverse() {
+    struct Node *prev = NULL, *curr = head, *next = NULL;§r_d
+    while (curr != NULL) {§r_w
+        next = curr->next;§r_1
+        curr->next = prev;§r_2
+        prev = curr;§r_3
+        curr = next;§r_4
+    }
+    head = prev;§r_h
+}§r_e
+
+int main() {
+    insertEnd(10);§c1
+    insertEnd(20);§c2
+    insertEnd(30);§c3
+    insertEnd(40);§c4
+    display();§c5
+    reverse();§c6
+    display();§c7
+    return 0;§mr
+}`;
+const L={};
+const src=raw.split('\n').map((t,k)=>{const m=t.match(/§(\w+)$/);if(m){L[m[1]]=k+1;t=t.slice(0,m.index)}return t.trimEnd()});
+const R={};{let cur=null;src.forEach((t,k)=>{const m=t.match(/^[\w\s\*]+?\b(\w+)\(.*\)\s*\{$/);if(m&&!cur){cur=[m[1],k+1]}else if(cur&&t==='}'){R[cur[0]]=[cur[1],k+1];cur=null}})}
+const st={nodes:[],ptr:{},head:''};let out='';const fr=['main()'],steps=[];let nA=0x1000;
+const T=st.ptr,alloc=()=>({v:'?',a:'0x'+(nA+=32).toString(16),n:'?'}),find=a=>st.nodes.find(x=>x.a===a),NU=a=>a||'NULL';
+const S=(line,msg,op='',hi=null)=>steps.push({line,msg,op,hi,st:JSON.parse(JSON.stringify(st)),out,fr:[...fr]});
+function peekFn(cl,hd,emp,lab){S(cl,'main calls peek(). It only reads, it never changes any pointer.');fr.unshift('peek()');
+ if(T[hd]===null){S(L.pk_c,hd+' == NULL? Yes.',hd+' == NULL → true');out+=emp+'\n';S(L.pk_e,'Print the empty message.')}
+ else{const n=find(T[hd]);S(L.pk_c,hd+' == NULL? No, so there is a node to read.',hd+' == NULL → false');out+=lab+n.v+'\n';S(L.pk_p,'Print the data of the node that '+hd+' points to. Nothing is removed.',hd+'->data = '+n.v,n.a)}
+ S(L.pk_x,'peek() ends and control returns to main().');fr.shift()}
+function displayFn(cl,hd,emp,head,sep,tail){S(cl,'main calls display(). It walks the list from '+hd+' to the end.');fr.unshift('display()');
+ T.temp=T[hd];S(L.ds_t,'temp starts at '+hd+'. We walk with temp so that '+hd+' itself is not lost.','temp = '+NU(T.temp),T.temp);
+ if(T.temp===null){S(L.ds_c,'temp == NULL? Yes.');out+=emp+'\n';S(L.ds_e,'Print the empty message.')}
+ else{S(L.ds_c,'temp == NULL? No, the list has nodes.');out+=head;S(L.ds_h,'Print the heading (no newline).');
+  while(T.temp!==null){const n=find(T.temp);S(L.ds_w,'temp != NULL? Yes (temp = '+n.a+') → run the loop body.','',n.a);out+=n.v+sep;S(L.ds_p,'Print '+n.v+'.','temp->data = '+n.v,n.a);T.temp=n.n;S(L.ds_a,'Move temp to the next node ('+NU(n.n)+').','temp = temp->next = '+NU(n.n),n.n)}
+  S(L.ds_w,'temp != NULL? No, temp is NULL → the loop ends.');out+=(tail?tail:'')+'\n';S(L.ds_n,tail?'Print NULL to mark the end of the list, then a newline.':'Print a newline.')}
+ delete T.temp;S(L.ds_x,'display() ends. temp was local, so it is gone.');fr.shift()}
+st.head='head';T.head=null;
+function ins(v,cl){S(cl,'main calls insertEnd('+v+'). Control jumps into insertEnd().','value = '+v);fr.unshift('insertEnd('+v+')');
+ const n=alloc();st.nodes.push(n);T.newNode=n.a;
+ S(L.i_m,'malloc() reserves a node at '+n.a+'. Its fields are garbage (?) for now.','newNode = '+n.a,n.a);
+ n.v=v;S(L.i_d,'Store '+v+' in the node.','newNode->data = '+v,n.a);
+ n.n=null;S(L.i_n,'The new node will be last, so its next is NULL.','newNode->next = NULL',n.a);
+ if(T.head===null){S(L.i_c,'head == NULL? Yes, the list is empty.','head == NULL → true');T.head=n.a;S(L.i_h,'The new node becomes the head of the list.','head = '+n.a,n.a)}
+ else{S(L.i_c,'head == NULL? No, we must find the last node first.','head == NULL → false');T.temp=T.head;S(L.i_t,'temp starts at head and will walk to the last node.','temp = '+T.head,T.head);
+  while(find(T.temp).n!==null){const c=find(T.temp);S(L.i_w,'temp->next != NULL? Yes ('+c.n+'), so temp is not the last node yet.','',c.a);T.temp=c.n;S(L.i_a,'Move temp one node forward.','temp = '+c.n,c.n)}
+  S(L.i_w,'temp->next != NULL? No, so temp is the last node.','',T.temp);find(T.temp).n=n.a;S(L.i_l,'The last node’s next now points to the new node, appending it.','temp->next = '+n.a,n.a)}
+ delete T.newNode;delete T.temp;S(L.i_e,'insertEnd() ends and its local pointers are gone.');fr.shift()}
+function reverse(cl){S(cl,'main calls reverse(). Control jumps into reverse().');fr.unshift('reverse()');
+ T.prev=null;T.curr=T.head;T.next=null;S(L.r_d,'prev = NULL (nothing behind the first node), curr = head, next = NULL.','prev = NULL, curr = '+T.head,T.head);
+ while(T.curr!==null){const c=find(T.curr);S(L.r_w,'curr != NULL? Yes (curr = '+c.v+'), there is still a node to flip.','',c.a);
+  T.next=c.n;S(L.r_1,'Save the next node before we break the link, otherwise the rest of the list would be lost.','next = curr->next = '+NU(c.n),c.a);
+  c.n=T.prev;S(L.r_2,'Flip the link: curr now points backwards to prev ('+NU(T.prev)+').','curr->next = '+NU(T.prev),c.a);
+  T.prev=T.curr;S(L.r_3,'prev moves up to curr.','prev = '+T.prev,c.a);
+  T.curr=T.next;S(L.r_4,'curr moves to the saved next node ('+NU(T.next)+').','curr = '+NU(T.next),T.next)}
+ S(L.r_w,'curr != NULL? No, curr is NULL → every link has been flipped.');
+ T.head=T.prev;S(L.r_h,'prev is the old last node. It becomes the new head.','head = '+T.head,T.head);
+ delete T.prev;delete T.curr;delete T.next;S(L.r_e,'reverse() ends. The list is now reversed without copying any data.');fr.shift()}
+S(L.c1-1,'Program starts: head = NULL, so the list is empty.','head = NULL');
+ins(10,L.c1);ins(20,L.c2);ins(30,L.c3);ins(40,L.c4);
+displayFn(L.c5,'head','List is empty','List: ',' -> ','NULL');
+reverse(L.c6);
+displayFn(L.c7,'head','List is empty','List: ',' -> ','NULL');
+S(L.mr,'return 0 tells the operating system the program finished successfully.','return 0');
+// ---------- UI ----------
+const $=id=>document.getElementById(id);let i=0,timer=null;
+$('code').innerHTML=src.map((t,k)=>`<div class="ln" id="l${k+1}"><i>${k+1}</i><span></span></div>`).join('');
+$('code').querySelectorAll('.ln span').forEach((s,k)=>s.textContent=src[k]);
+$('sl').max=steps.length-1;
+function heapHTML(s){const N=s.st.nodes,P=s.st.ptr;if(!N.length)return '<span class="legend">The heap is empty: no nodes yet.</span>';
+ const lab=a=>Object.entries(P).filter(([k,v])=>v===a).map(([k])=>'<u>'+k+'</u>').join('');let h='';
+ N.forEach((x,k)=>{h+=`<div class="nd${s.hi===x.a?' hi':''}"><div class="pl">${lab(x.a)}</div><div class="bx"><span>${x.v}</span><span>${x.n===null?'NULL':x.n==='?'?'?':'→'+x.n.slice(2)}</span></div><small>${x.a}</small></div>`;
+  const y=N[k+1];if(y){const f=x.n===y.a,b=y.n===x.a;h+=`<div class="ar${f||b?'':' no'}">${f&&b?'⇄':f?'→':b?'←':'·'}</div>`}else if(x.n===null)h+='<div class="nl">→ NULL</div>'});return h}
+function render(){const s=steps[i],name=s.fr[0].split('(')[0],r=R[name];
+ for(let k=1;k<=src.length;k++){$('l'+k).className='ln'+(r&&k>=r[0]&&k<=r[1]?' fn':'')+(k===s.line?' cur':'')}
+ $('l'+s.line).scrollIntoView({block:'nearest'});
+ $('where').textContent='(inside '+name+'())';$('msg').textContent=s.msg;$('op').textContent=s.op?'⚙ '+s.op:'';
+ $('heap').innerHTML=heapHTML(s);
+ const ex=a=>s.st.nodes.some(x=>x.a===a);
+ $('vars').innerHTML=Object.entries(s.st.ptr).map(([k,v])=>`<span><b>${k}</b> = ${v===null?'NULL':v}${v&&!ex(v)?' <em>(freed)</em>':''}</span>`).join('');
+ $('fr').innerHTML=s.fr.map(f=>`<div>${f}</div>`).join('');$('out').textContent=s.out||' ';
+ $('cnt').textContent=`Step ${i+1} / ${steps.length}`;$('sl').value=i;$('pv').disabled=i===0;$('nx').disabled=i===steps.length-1;if(i===steps.length-1)stop()}
+function go(n){i=Math.max(0,Math.min(steps.length-1,n));render()}
+function stop(){clearInterval(timer);timer=null;$('au').textContent='Auto play'}
+$('nx').onclick=()=>{stop();go(i+1)};$('pv').onclick=()=>{stop();go(i-1)};$('rs').onclick=()=>{stop();go(0)};
+$('sl').oninput=e=>{stop();go(+e.target.value)};
+$('au').onclick=()=>{if(timer){stop();return}if(i===steps.length-1)go(0);$('au').textContent='Pause';timer=setInterval(()=>go(i+1),+$('sp').value)};
+$('sp').onchange=()=>{if(timer){clearInterval(timer);timer=setInterval(()=>go(i+1),+$('sp').value)}};
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+render();
+</script></body></html>
