@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Postfix Evaluation using Stack Tracer | DS_TRACE LAB</title>
+<meta name="description" content="Trace postfix expression evaluation in C with a stack, line by line.">
+<style>
+:root{--bg:#0d1017;--sf:#161b26;--tx:#eef0f5;--mu:#97a0b4;--ac:#ff8a4c;--ac2:#3bc9db;--bd:#262d3d;--ok:#51cf66;--cb:#0a0d13}
+:root[data-theme="light"]{--bg:#f6f4ee;--sf:#fff;--tx:#1b1f2a;--mu:#5d6475;--ac:#e8590c;--ac2:#0b7285;--bd:#e2ded2;--ok:#2b8a3e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 "Segoe UI",system-ui,sans-serif}
+.w{max-width:1180px;margin:0 auto;padding:0 16px 30px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:16px 0;gap:10px;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:1px;color:inherit;text-decoration:none}.logo b{color:var(--ac)}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer;text-decoration:none;font-size:.92rem;display:inline-block}
+.btn.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}.btn:disabled{opacity:.4;cursor:default}
+h1{font-size:clamp(1.6rem,4vw,2.3rem);margin:.2em 0}.sub{color:var(--mu);margin:0 0 14px;max-width:780px}
+.rule{background:var(--sf);border:1px solid var(--bd);border-left:4px solid var(--ac);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.pg{display:grid;grid-template-columns:1fr 1.05fr;gap:14px}@media(max-width:860px){.pg{grid-template-columns:1fr}}
+.box{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:14px}
+pre{position:relative;margin:0;background:var(--cb);color:#d6dbe6;border-radius:10px;padding:8px 0;overflow:auto;max-height:600px;font:13px/1.65 Consolas,Menlo,monospace}
+.ln{display:block;padding:0 12px;white-space:pre;border-left:4px solid transparent}.ln i{color:#6b7389;font-style:normal;display:inline-block;width:2.4em}
+.ln.cm{color:#7f8aa3}
+.ln.on{background:#3b2a10;border-left-color:#ffb347;color:#fff}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--mu);margin-bottom:8px}.leg b{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.lbl{color:var(--mu);font-size:.75rem;font-weight:800;letter-spacing:1px;margin-top:10px}
+.ex{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.ch{width:44px;text-align:center}.ch div{height:44px;border:2px solid var(--bd);border-radius:8px;display:flex;align-items:center;justify-content:center;font:800 1.2rem Consolas,monospace}
+.ch.op div{color:var(--ac2)}.ch.dn div{border-color:var(--ok);opacity:.6}.ch.cu div{border-color:var(--ac);background:var(--ac);color:#fff;opacity:1}
+.ch small{color:var(--mu);font-size:.7rem}
+.wrap{display:grid;grid-template-columns:130px 1fr;gap:14px;margin-top:4px}
+.stk{display:flex;flex-direction:column-reverse;gap:4px;min-height:190px;border-bottom:3px solid var(--ac2);padding-bottom:4px;justify-content:flex-start}
+.it{height:32px;border:2px solid var(--ac2);border-radius:7px;text-align:center;font-weight:800;line-height:28px}.it.t{border-color:var(--ac);color:var(--ac)}
+.vars{font:14px/1.8 Consolas,monospace}.vars b{color:var(--ac)}
+.fr{font:13px Consolas,monospace;border:1px solid var(--bd);border-radius:6px;padding:2px 8px;margin-top:4px}.fr.t{border-color:var(--ac);color:var(--ac);font-weight:700}.fr small{color:var(--mu);font-weight:400}
+.out{font:13px/1.5 Consolas,monospace;color:var(--ok);background:var(--cb);border-radius:8px;padding:8px 10px;white-space:pre-wrap;min-height:3.4em;margin-top:4px}
+.note{background:var(--bg);border-left:4px solid var(--ac);border-radius:8px;padding:10px 12px;margin:12px 0;min-height:3.6em}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.cnt{color:var(--mu);font-size:.88rem;margin-left:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;align-items:center}.chip{background:transparent;color:var(--mu);border:1px solid var(--bd);border-radius:8px;padding:2px 10px;cursor:pointer;font:700 .9rem Consolas,monospace}.chip:hover{color:var(--ac);border-color:var(--ac)}
+select{background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:6px}
+input{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font:700 1.05rem Consolas,monospace;width:210px;max-width:100%}.inp{line-height:2.2}
+footer{border-top:1px solid var(--bd);margin-top:26px;padding-top:16px;color:var(--mu);font-size:.88rem;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}footer a{color:var(--ac2)}
+</style></head><body><div class="w">
+<nav><a class="logo" href="index.html">DS_TRACE <b>LAB</b></a><a class="btn g" href="index.html">← All topics</a></nav>
+<h1>Postfix Expression Evaluation using Stack</h1>
+<p class="sub" id="sub"></p>
+<div class="rule inp"><b>Postfix Expression :</b> <input id="inp" value="53+82-*" maxlength="25" aria-label="Postfix expression" autocomplete="off"> <button class="btn" id="ap">Trace it</button> <button class="btn g" id="df">Use default</button><br><small style="color:var(--mu)">Use single digits 0-9 and + - * / (spaces are ignored). Try 123*+ or 5+ to see an underflow.</small> <span id="er" style="color:var(--ac);font-weight:700"></span></div>
+<div class="rule"><b>Rule:</b> read left to right. A <b>digit</b> is pushed. An <b>operator</b> pops two values (the first pop is val2, the second is val1), computes val1 operator val2, and pushes the result back. The last value left is the answer.</div>
+<div class="pg">
+ <div class="box"><div class="leg"><span><b style="background:#ffb347"></b>Running now</span></div><pre id="code"></pre></div>
+ <div class="box">
+  <div class="chips" id="chips"></div>
+  <div class="lbl" style="margin-top:0">EXPRESSION (exp[i])</div><div class="ex" id="ex"></div>
+  <div class="wrap"><div><div class="lbl" style="margin-top:0">STACK</div><div class="stk" id="stk"></div></div>
+   <div><div class="lbl" style="margin-top:0">VARIABLES</div><div class="vars" id="vars"></div></div></div>
+  <div class="note" id="note"></div>
+  <div class="ctl"><button class="btn g" id="pv">← Prev</button><button class="btn" id="nx">Next →</button><button class="btn g" id="pl">▶ Play</button><button class="btn g" id="rs">Reset</button>
+   <select id="sp"><option value="1100">Slow</option><option value="650" selected>Normal</option><option value="300">Fast</option></select><span class="cnt" id="cnt"></span></div>
+  <div class="lbl">PROGRAM OUTPUT</div><div class="out" id="out"></div>
+ </div>
+</div>
+<footer><span>© 2026 DS_TRACE LAB by Vivek · <a href="https://vivek-22.tech">vivek-22.tech</a> · MIT License</span><span>Powered by HTML5 · Tip: use ← → keys</span></footer>
+</div>
+<script>
+const C=String.raw`#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+#define MAX 100
+
+// Stack structure for integer operands
+int stack[MAX];
+int top = -1;
+
+// Function to push element onto stack
+void push(int val) {
+    if (top == MAX - 1) {
+        printf("Stack Overflow!\n");
+        return;
+    }
+    stack[++top] = val;
+}
+
+// Function to pop element from stack
+int pop() {
+    if (top == -1) {
+        printf("Stack Underflow!\n");
+        exit(1);
+    }
+    return stack[top--];
+}
+
+// Function to evaluate postfix expression
+int evaluatePostfix(char* exp) {
+    for (int i = 0; exp[i] != '\0'; i++) {
+        // If the character is a digit, push it onto stack
+        if (isdigit(exp[i])) {
+            push(exp[i] - '0'); // Convert char to int
+        }
+        // If character is an operator, pop two operands and compute
+        else if (exp[i] == '+' || exp[i] == '-' || exp[i] == '*' || exp[i] == '/') {
+            int val2 = pop();
+            int val1 = pop();
+
+            switch (exp[i]) {
+                case '+': push(val1 + val2); break;
+                case '-': push(val1 - val2); break;
+                case '*': push(val1 * val2); break;
+                case '/': push(val1 / val2); break;
+            }
+        }
+    }
+    return pop();
+}
+
+int main() {
+    char postfix[] = "53+82-*"; // Equivalent to: (5 + 3) * (8 - 2) = 8 * 6 = 48
+
+    printf("--- Postfix Expression Evaluation using Stack ADT ---\n\n");
+    printf("Postfix Expression : %s\n", postfix);
+
+    int result = evaluatePostfix(postfix);
+
+    printf("Evaluated Result   : %d\n", result);
+
+    return 0;
+}`.split("\n");
+const ln=(t,f=0)=>{for(let k=f;k<C.length;k++)if(C[k].includes(t))return k+1;return 1};
+const $=id=>document.getElementById(id),DEF="53+82-*",F=lb=>({lb,ln:0});
+let EXP=DEF;
+let S=[],i=0,timer=null,st,tp,I,v1,v2,out,fr,starts,PHT;
+function snap(line,note){if(fr[0])fr[0].ln=line;S.push({line,note,I,st:st.slice(),tp,v1,v2,out,fr:fr.map(f=>({lb:f.lb,ln:f.ln}))})}
+function build(){
+ st=[];tp=-1;I=-1;v1=v2=null;out="";fr=[F("main()")];S=[];starts=[];PHT={};
+ const LP=ln("void push(int val)"),LPO=ln("if (top == MAX - 1)"),LPS=ln("stack[++top] = val"),
+ LPP=ln("int pop()"),LPU=ln("if (top == -1)"),LPR=ln("return stack[top--]"),
+ LE=ln("int evaluatePostfix"),LF=ln("for (int i = 0"),LD=ln("if (isdigit"),LPD=ln("push(exp[i] - '0')"),LEL=ln("else if (exp[i] == '+'"),
+ LV2=ln("int val2 = pop()"),LV1=ln("int val1 = pop()"),LSW=ln("switch (exp[i])"),LRT=ln("return pop();"),
+ CS={"+":ln("case '+'"),"-":ln("case '-'"),"*":ln("case '*'"),"/":ln("case '/'")},
+ MP=ln("char postfix[]"),M1=ln('printf("--- Postfix'),M2=ln('printf("Postfix Expression'),MC=ln("int result = evaluatePostfix"),M3=ln('printf("Evaluated Result'),MR=ln("return 0"),LUP=ln('printf("Stack Underflow'),LEX=ln("exit(1)");
+ PHT[LPD]="waiting for push() to return";PHT[LV2]="waiting for pop() to return";PHT[LV1]="waiting for pop() to return";PHT[LRT]="waiting for pop() to return";PHT[MC]="waiting for evaluatePostfix() to return";
+ Object.values(CS).forEach(l=>PHT[l]="waiting for push() to return");
+ function push(v){fr.unshift(F(`push(${v})`));snap(LP,`Call push(${v}).`);
+  snap(LPO,`top == MAX - 1 ? ${tp} == 99 is FALSE, so there is room.`);
+  st[++tp]=v;snap(LPS,`stack[++top] = val: top becomes ${tp} and stack[${tp}] = ${v}.`);fr.shift()}
+ function pop(){fr.unshift(F("pop()"));snap(LPP,"Call pop().");
+  if(tp==-1){snap(LPU,"top == -1 is TRUE: the stack is empty!");out+="Stack Underflow!\n";snap(LUP,"printf prints Stack Underflow!");snap(LEX,"exit(1) ends the program immediately. This is not a valid postfix expression.");throw "end"}
+  snap(LPU,`top == -1 ? ${tp} == -1 is FALSE, so the stack is not empty.`);
+  const v=st[tp];st.pop();tp--;snap(LPR,`return stack[top--]: returns ${v}, then top becomes ${tp}.`);fr.shift();return v}
+ try{
+ snap(ln("int top = -1"),"Globals: the stack is empty, so top = -1.");
+ snap(MP,`postfix = "${EXP}"${EXP==DEF?". Equivalent to (5 + 3) * (8 - 2).":"."}`);
+ out+="--- Postfix Expression Evaluation using Stack ADT ---\n\n";snap(M1,"printf prints the title.");
+ out+=`Postfix Expression : ${EXP}\n`;snap(M2,"printf prints the expression.");
+ snap(MC,"main calls evaluatePostfix(postfix).");
+ fr.unshift(F(`evaluatePostfix("${EXP}")`));snap(LE,"Enter evaluatePostfix.");
+ for(let k=0;k<EXP.length;k++){
+  const c=EXP[k];I=k;v1=v2=null;starts.push([c,S.length]);
+  snap(LF,`i = ${k}, exp[${k}] = '${c}'. It is not '\\0', so the loop continues.`);
+  const dg=/\d/.test(c);
+  snap(LD,`isdigit('${c}') is ${dg?"TRUE":"FALSE"}.`);
+  if(dg){snap(LPD,`push('${c}' - '0'): the char becomes the number ${+c}. Call push(${+c}).`);push(+c)}
+  else{
+   snap(LEL,`'${c}' is an operator, so pop two operands and compute.`);
+   snap(LV2,"val2 = pop(): the FIRST pop gives the right operand.");const a=pop();v2=a;snap(LV2,`Returned ${a}. val2 = ${a}.`);
+   snap(LV1,"val1 = pop(): the SECOND pop gives the left operand.");const b=pop();v1=b;snap(LV1,`Returned ${b}. val1 = ${b}.`);
+   snap(LSW,`switch (exp[i]) looks at '${c}'.`);
+   const r=c=="+"?b+a:c=="-"?b-a:c=="*"?b*a:Math.trunc(b/a);
+   if(c=="/"&&a==0){snap(CS[c],`case '/': ${b} / 0 is division by zero! A real C program would crash here.`);throw "end"}
+   snap(CS[c],`case '${c}': compute ${b} ${c} ${a} = ${r}, then call push(${r}).`);push(r);
+  }
+ }
+ I=EXP.length;v1=v2=null;snap(LF,`i = ${EXP.length}, exp[${EXP.length}] is '\\0', the end of the string. The loop stops.`);
+ snap(LRT,"return pop(): call pop() to get the final answer.");const r=pop();
+ snap(LRT,`Returned ${r}. evaluatePostfix returns ${r}.`);fr.shift();
+ snap(MC,`result = ${r}.`);
+ out+=`Evaluated Result   : ${r}\n`;snap(M3,`printf prints the result: ${r}.`);snap(MR,"Program ends."+(st.length?` Note: ${st.length} value(s) are still left on the stack, so this was not a perfect postfix expression.`:EXP==DEF?" (5 + 3) * (8 - 2) = 48.":""));}catch(e){if(e!="end")throw e}
+}
+function renderCode(){const k=ln("char postfix[]")-1;C[k]=`    char postfix[] = "${EXP}";`+(EXP==DEF?" // Equivalent to: (5 + 3) * (8 - 2) = 8 * 6 = 48":"");
+$("code").innerHTML=C.map((s,n)=>`<span class="ln${s.trim().startsWith("//")?" cm":""}" id="L${n+1}"><i>${n+1}</i>${s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}</span>`).join("");}
+function draw(){
+ const s=S[i];
+ document.querySelectorAll(".ln.on").forEach(e=>e.classList.remove("on"));
+ const el=$("L"+s.line);el.classList.add("on");$("code").scrollTop=el.offsetTop-$("code").clientHeight/2;
+ $("note").textContent=s.note;$("out").textContent=s.out;
+ $("ex").innerHTML=(EXP+"\\0").split(/(?=[\s\S])/).reduce((a,c,k)=>{const e=k==EXP.length?"\\0":EXP[k];a.push(`<div class="ch${/\d/.test(e)?"":" op"}${k==s.I?" cu":k<s.I?" dn":""}"><div>${e}</div><small>[${k}]</small></div>`);return a},[]).slice(0,EXP.length+1).join("");
+ $("stk").innerHTML=s.st.map((v,k)=>`<div class="it${k==s.tp?" t":""}">${v}${k==s.tp?" ← top":""}</div>`).join("")||'<div style="color:var(--mu);font-size:.85rem">(empty)</div>';
+ $("vars").innerHTML=`i = <b>${s.I<0?"-":s.I}</b><br>exp[i] = <b>${s.I>=0&&s.I<EXP.length?"'"+EXP[s.I]+"'":s.I==EXP.length?"'\\0'":"-"}</b><br>top = <b>${s.tp}</b><br>val1 = <b>${s.v1??"-"}</b><br>val2 = <b>${s.v2??"-"}</b>`;
+ $("cnt").textContent=`Step ${i+1} / ${S.length}`;$("pv").disabled=i==0;$("nx").disabled=i==S.length-1;
+}
+function next(){if(i<S.length-1){i++;draw()}else stop()}
+function stop(){clearInterval(timer);timer=null;$("pl").textContent="▶ Play"}
+$("nx").onclick=()=>{stop();next()};$("pv").onclick=()=>{stop();if(i>0){i--;draw()}};
+$("rs").onclick=()=>{stop();i=0;draw()};
+$("pl").onclick=()=>{if(timer){stop();return}if(i==S.length-1)i=0;$("pl").textContent="⏸ Pause";timer=setInterval(next,+$("sp").value);draw()};
+$("sp").onchange=()=>{if(timer){clearInterval(timer);timer=setInterval(next,+$("sp").value)}};
+document.addEventListener("keydown",e=>{if(e.key=="ArrowRight"){stop();next()}if(e.key=="ArrowLeft"){stop();if(i>0){i--;draw()}}});
+try{const t=localStorage.getItem("dstl-th");if(t)document.documentElement.dataset.theme=t}catch(e){}
+$("chips").onclick=e=>{const b=e.target.closest(".chip");if(b){stop();i=+b.dataset.ix;draw()}};
+function load(){stop();renderCode();build();i=0;
+ $("sub").innerHTML=`Expression: <b>${EXP}</b>`+(EXP==DEF?" which means (5 + 3) * (8 - 2) = 48.":"")+" Step through the C code and watch the stack.";
+ $("chips").innerHTML='<span class="lbl" style="margin:0 4px 0 0">JUMP TO CHAR:</span>'+starts.map(([c,ix])=>`<button class="chip" data-ix="${ix}">${c}</button>`).join("");draw()}
+function apply(){const v=$("inp").value.replace(/\s+/g,""),er=$("er");
+ if(!v){er.textContent="Type an expression first.";return}
+ if(!/^[0-9+\-*\/]+$/.test(v)){er.textContent="Use only single digits 0-9 and + - * /";return}
+ er.textContent="";EXP=v;$("inp").value=v;load()}
+$("ap").onclick=apply;$("df").onclick=()=>{$("inp").value=DEF;$("er").textContent="";EXP=DEF;load()};
+$("inp").addEventListener("keydown",e=>{if(e.key=="Enter")apply();e.stopPropagation()});
+load();
+</script></body></html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Binary Search Tree Tracer | DS_TRACE LAB</title>
+<meta name="description" content="Trace BST insertion and inorder, preorder, postorder traversal in C, line by line, with a live recursion call stack.">
+<style>
+:root{--bg:#0d1017;--sf:#161b26;--tx:#eef0f5;--mu:#97a0b4;--ac:#ff8a4c;--ac2:#3bc9db;--bd:#262d3d;--ok:#51cf66;--cb:#0a0d13}
+:root[data-theme="light"]{--bg:#f6f4ee;--sf:#fff;--tx:#1b1f2a;--mu:#5d6475;--ac:#e8590c;--ac2:#0b7285;--bd:#e2ded2;--ok:#2b8a3e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 "Segoe UI",system-ui,sans-serif}
+.w{max-width:1180px;margin:0 auto;padding:0 16px 30px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:16px 0;gap:10px;flex-wrap:wrap}
+.logo{font-weight:800;letter-spacing:1px}.logo b{color:var(--ac)}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer;text-decoration:none;font-size:.92rem;display:inline-block}
+.btn.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}.btn:disabled{opacity:.4;cursor:default}
+h1{font-size:clamp(1.6rem,4vw,2.4rem);margin:.2em 0}.sub{color:var(--mu);margin:0 0 14px;max-width:760px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tab{background:var(--sf);color:var(--mu);border:1px solid var(--bd);border-radius:999px;padding:7px 16px;cursor:pointer;font-weight:700}
+.tab.on{background:var(--ac2);color:#fff;border-color:var(--ac2)}
+.rule{background:var(--sf);border:1px solid var(--bd);border-left:4px solid var(--ac);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.pg{display:grid;grid-template-columns:1fr 1.05fr;gap:14px}@media(max-width:860px){.pg{grid-template-columns:1fr}}
+.box{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:14px}
+pre{position:relative;margin:0;background:var(--cb);color:#d6dbe6;border-radius:10px;padding:8px 0;overflow:auto;max-height:560px;font:13px/1.65 Consolas,Menlo,monospace}
+.ln{display:block;padding:0 12px;white-space:pre;border-left:4px solid transparent}.ln i{color:#6b7389;font-style:normal;display:inline-block;width:2.4em}
+.ln.cm{color:#7f8aa3}.ln.on{background:#3b2a10;border-left-color:#ffb347;color:#fff}.ln.on::after{content:'  ◀ RUNNING NOW';color:#ffb347;font-weight:700}
+.ln.wt{background:#0f3340;border-left-color:#3bc9db;color:#cdeff5}.ln.wt::after{content:'  ↩ paused, waiting for call to return';color:#3bc9db}
+.ln.on.wt::after{content:'  ◀ RUNNING NOW (also a paused call above)';color:#ffb347}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--mu);margin-bottom:8px}.leg b{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.fr small{color:var(--mu)}
+.log{font:12.5px/1.5 Consolas,monospace;max-height:160px;overflow:auto;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 8px;margin-top:4px}
+.lg{white-space:pre;padding:0 4px;border-radius:4px}.lg.c{color:var(--ac2)}.lg.r{color:var(--mu)}.lg.p{color:var(--ok);font-weight:700}.lg.now{background:rgba(255,138,76,.18)}
+.nd.path circle{stroke:var(--ac2);stroke-width:6}
+svg{width:100%;height:auto;display:block;background:var(--bg);border-radius:10px;border:1px solid var(--bd)}
+.ed{stroke:var(--mu);stroke-width:2}.nd circle{fill:var(--sf);stroke:var(--ac2);stroke-width:3;transition:all .25s}
+.nd text{fill:var(--tx);font-weight:800;font-size:15px;text-anchor:middle}
+.nd.act circle{fill:var(--ac);stroke:var(--ac)}.nd.act text{fill:#fff}
+.nd.vis circle{stroke:var(--ok);fill:var(--ok)}.nd.vis text{fill:#fff}.nd.act.vis circle{fill:var(--ac)}
+.nd.new circle{stroke-dasharray:4 3}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.lbl{color:var(--mu);font-size:.75rem;font-weight:800;letter-spacing:1px}
+.stk{display:flex;flex-direction:column;gap:4px;min-height:96px;margin-top:4px}
+.fr{font:13px Consolas,monospace;border:1px solid var(--bd);border-radius:6px;padding:2px 8px}.fr.t{border-color:var(--ac);color:var(--ac);font-weight:700}
+.out{font:15px Consolas,monospace;color:var(--ok);margin-top:4px;min-height:1.6em;word-break:break-all}
+.note{background:var(--bg);border-left:4px solid var(--ac);border-radius:8px;padding:10px 12px;margin:10px 0;min-height:3.6em}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.cnt{color:var(--mu);font-size:.88rem;margin-left:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.chip{background:transparent;color:var(--mu);border:1px solid var(--bd);border-radius:8px;padding:2px 9px;cursor:pointer;font-size:.85rem}.chip:hover{color:var(--ac);border-color:var(--ac)}
+.pend{font:13px Consolas,monospace;color:var(--ac);min-height:1.4em;margin-bottom:4px}
+select{background:var(--sf);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:6px}
+footer{border-top:1px solid var(--bd);margin-top:26px;padding-top:16px;color:var(--mu);font-size:.88rem;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+footer a{color:var(--ac2)}
+</style></head><body><div class="w">
+<nav><a class="logo" href="index.html" style="color:inherit;text-decoration:none">DS_TRACE <b>LAB</b></a><a class="btn g" href="index.html">← All topics</a></nav>
+<h1>Binary Search Tree: Insertion &amp; Traversals</h1>
+<p class="sub">Choose an operation, then step through the C code. Watch the tree grow and the recursion call stack rise and fall.</p>
+<div class="tabs" id="tabs"></div>
+<div class="rule" id="rule"></div>
+<div class="pg">
+ <div class="box"><div class="leg"><span><b style="background:#ffb347"></b>Running now</span><span><b style="background:#3bc9db"></b>Paused call (waiting to return)</span></div><pre id="code"></pre></div>
+ <div class="box">
+  <div class="chips" id="chips"></div>
+  <div class="pend" id="pend"></div>
+  <svg id="svg" viewBox="0 0 460 200" role="img" aria-label="Binary search tree"></svg>
+  <div class="leg" style="margin:6px 0 0"><span><b style="background:#ff8a4c"></b>running node</span><span><b style="background:#3bc9db"></b>paused, waiting for a child call</span><span><b style="background:#51cf66"></b>printed</span></div>
+  <div class="note" id="note"></div>
+  <div class="ctl"><button class="btn g" id="pv">← Prev</button><button class="btn" id="nx">Next →</button><button class="btn g" id="pl">▶ Play</button><button class="btn g" id="rs">Reset</button>
+   <select id="sp"><option value="1100">Slow</option><option value="650" selected>Normal</option><option value="300">Fast</option></select><span class="cnt" id="cnt"></span></div>
+  <div class="meta" style="grid-template-columns:1fr"><div><div class="lbl">CALL CHAIN (oldest → newest, indented = deeper)</div><div class="stk" id="stk"></div></div>
+  <div><div class="lbl">RECURSION LOG (→ call, ← return)</div><div class="log" id="log"></div></div>
+  <div><div class="lbl">OUTPUT</div><div class="out" id="out"></div></div></div>
+ </div>
+</div>
+<footer><span>© 2026 DS_TRACE LAB by Vivek · <a href="https://vivek-22.tech">vivek-22.tech</a> · MIT License</span><span>Powered by HTML5 · Tip: use ← → keys</span></footer>
+</div>
+<script>
+const C=String.raw`#include <stdio.h>
+#include <stdlib.h>
+
+// Structure defining a BST Node
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+};
+
+// Function to create a new node
+struct Node* createNode(int value) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = value;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a value into the BST
+struct Node* insert(struct Node* root, int value) {
+    if (root == NULL) {
+        return createNode(value);
+    }
+
+    if (value < root->data) {
+        root->left = insert(root->left, value);
+    } else if (value > root->data) {
+        root->right = insert(root->right, value);
+    }
+
+    return root;
+}
+
+// Inorder Traversal (Left, Root, Right)
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d ", root->data);
+        inorder(root->right);
+    }
+}
+
+// Preorder Traversal (Root, Left, Right)
+void preorder(struct Node* root) {
+    if (root != NULL) {
+        printf("%d ", root->data);
+        preorder(root->left);
+        preorder(root->right);
+    }
+}
+
+// Postorder Traversal (Left, Right, Root)
+void postorder(struct Node* root) {
+    if (root != NULL) {
+        postorder(root->left);
+        postorder(root->right);
+        printf("%d ", root->data);
+    }
+}
+
+int main() {
+    struct Node* root = NULL;
+
+    // Inserting values: 50, 30, 20, 40, 70, 60, 80
+    root = insert(root, 50);
+    insert(root, 30);
+    insert(root, 20);
+    insert(root, 40);
+    insert(root, 70);
+    insert(root, 60);
+    insert(root, 80);
+
+    inorder(root);
+    preorder(root);
+    postorder(root);
+
+    return 0;
+}`.split("\n");
+const ln=(t,f=0)=>{for(let i=f;i<C.length;i++)if(C[i].includes(t))return i+1;return 1};
+const VALS=[50,30,20,40,70,60,80];
+const POS={20:[50,40],30:[110,100],40:[170,160],50:[230,40],60:[290,160],70:[350,100],80:[410,160]};
+POS[30]=[110,100];POS[20]=[50,160];POS[40]=[170,160];POS[50]=[230,40];POS[70]=[350,100];POS[60]=[290,160];POS[80]=[410,160];
+const $=id=>document.getElementById(id);
+let PHT={},LOG=[];
+let S=[],i=0,mode="insert",timer=null,root,stack,printed,out,pend,starts;
+const F=lb=>({lb,ln:0});
+function snap(line,note,act){if(stack[0])stack[0].ln=line;S.push({line,note,act:act??null,tree:JSON.stringify(root),stack:stack.map(f=>({lb:f.lb,ln:f.ln})),vis:printed.slice(),out,pend})}
+function reset(){PHT={};root=null;stack=[F("main()")];printed=[];out="";pend=null;S=[];starts=[]}
+/* ---------- INSERTION ---------- */
+function buildInsert(){
+ reset();
+ const LI=ln("struct Node* insert("),LN=ln("if (root == NULL)",LI),LC=ln("return createNode(value)",LI),LL=ln("if (value < root->data)",LI),
+ LLR=ln("root->left = insert",LI),LG=ln("else if (value > root->data)",LI),LRR=ln("root->right = insert",LI),LRT=ln("return root;",LI),
+ CN=ln("struct Node* createNode("),CM=ln("malloc",CN),CD=ln("newNode->data",CN),CL=ln("newNode->left",CN),CR=ln("newNode->right",CN),CT=ln("return newNode",CN);
+ PHT[LLR]="waiting for LEFT insert() to return";PHT[LRR]="waiting for RIGHT insert() to return";PHT[LC]="waiting for createNode() to return";
+ snap(ln("struct Node* root = NULL"),"root = NULL. The tree is empty.");
+ function ins(n,v){
+  stack.unshift(F(`insert(${n?n.v:"NULL"}, ${v})`));
+  snap(LI,`Call insert(root=${n?n.v:"NULL"}, value=${v}).`,n&&n.v);
+  snap(LN,n?`root is ${n.v}, not NULL, so skip this block.`:`root == NULL is TRUE. This empty spot is where ${v} belongs!`,n&&n.v);
+  if(!n){
+   snap(LC,`return createNode(${v}): build the new node.`);
+   stack.unshift(F(`createNode(${v})`));pend=v;
+   snap(CN,`Call createNode(${v}).`);
+   snap(CM,"malloc reserves memory for one node.");
+   snap(CD,`newNode->data = ${v}.`);
+   snap(CL,"left = NULL and right = NULL. A new node is always a leaf.");
+   snap(CR,"right = NULL.");
+   snap(CT,"Return the pointer to the new node.");
+   stack.shift();stack.shift();
+   return {v,l:null,r:null};
+  }
+  snap(LL,`${v} < ${n.v} ? ${v<n.v?"TRUE":"FALSE"}`,n.v);
+  if(v<n.v){
+   snap(LLR,`Smaller, so go LEFT: insert(root->left, ${v}).`,n.v);
+   const r=ins(n.l,v);n.l=r;pend=null;
+   snap(LLR,`Returned. root->left now points to ${r.v}. Link done.`,n.v);
+  }else{
+   snap(LG,`${v} > ${n.v} ? ${v>n.v?"TRUE":"FALSE"}`,n.v);
+   snap(LRR,`Bigger, so go RIGHT: insert(root->right, ${v}).`,n.v);
+   const r=ins(n.r,v);n.r=r;pend=null;
+   snap(LRR,`Returned. root->right now points to ${r.v}. Link done.`,n.v);
+  }
+  snap(LRT,`return root (${n.v}) to the caller.`,n.v);
+  stack.shift();return n;
+ }
+ VALS.forEach((v,k)=>{
+  const ml=ln(`insert(root, ${v})`);starts.push([v,S.length]);
+  snap(ml,`main: call insert(root, ${v}).`,root&&root.v);
+  const r=ins(root,v);
+  if(k==0){root=r;pend=null;snap(ml,`root = returned node. ${v} is now the ROOT of the tree.`,v)}
+  else{snap(ml,`Returned. ${v} is placed. root still points to ${root.v}.`,v)}
+ });
+ pend=null;snap(ln("inorder(root);"),"Tree complete! Now open the traversal tabs.");
+}
+/* ---------- TRAVERSALS ---------- */
+function buildTrav(name,order){
+ reset();
+ VALS.forEach(v=>{let n=root,p=null;const nn={v,l:null,r:null};if(!root){root=nn;return}n=root;while(1){if(v<n.v){if(!n.l){n.l=nn;break}n=n.l}else{if(!n.r){n.r=nn;break}n=n.r}}});
+ const H=ln(`void ${name}(`),I=ln("if (root != NULL)",H),PR=ln('printf("%d "',H),LC=ln(`${name}(root->left)`,H),RC=ln(`${name}(root->right)`,H);
+ let E=H;for(let k=H;k<C.length;k++)if(C[k]=="}"){E=k+1;break}
+ PHT[LC]="waiting for LEFT subtree to finish";PHT[RC]="waiting for RIGHT subtree to finish";
+ function go(n){
+  const lb=`${name}(${n?n.v:"NULL"})`;stack.unshift(F(lb));
+  snap(H,`Call ${lb}.`,n&&n.v);
+  if(!n){snap(I,"root == NULL, so the condition is FALSE. Nothing to do, go back.");stack.shift();return}
+  snap(I,`${n.v} is not NULL, so enter the block.`,n.v);
+  for(const s of order){
+   if(s=="L"){snap(LC,`Go LEFT of ${n.v}: ${name}(${n.l?n.l.v:"NULL"}).`,n.v);go(n.l)}
+   if(s=="R"){snap(RC,`Go RIGHT of ${n.v}: ${name}(${n.r?n.r.v:"NULL"}).`,n.v);go(n.r)}
+   if(s=="P"){printed.push(n.v);out+=n.v+" ";snap(PR,`VISIT ${n.v}: printf prints ${n.v}.`,n.v)}
+  }
+  snap(E,`Done with ${n.v}. Return to the caller.`,n.v);stack.shift();
+ }
+ snap(ln(`${name}(root);`),`main: call ${name}(root). root is ${root.v}.`,root.v);
+ go(root);
+ snap(ln("return 0"),`Finished! Output: ${out.trim()}`);
+}
+/* ---------- UI ---------- */
+const M={insert:["Insertion",null,"Rule: smaller goes LEFT, bigger goes RIGHT, NULL means place the new node here. Duplicates are ignored."],
+ inorder:["Inorder","LPR","Left → Root → Right. On a BST the result is SORTED: 20 30 40 50 60 70 80."],
+ preorder:["Preorder","PLR","Root → Left → Right. Visit the node BEFORE its children: 50 30 20 40 70 60 80. Used to copy a tree."],
+ postorder:["Postorder","LRP","Left → Right → Root. Children BEFORE the node: 20 40 30 60 80 70 50. Used to delete a tree."]};
+$("tabs").innerHTML=Object.keys(M).map(k=>`<button class="tab" data-m="${k}">${M[k][0]}</button>`).join("");
+$("tabs").onclick=e=>{const b=e.target.closest(".tab");if(b)setMode(b.dataset.m)};
+$("code").innerHTML=C.map((s,n)=>`<span class="ln${s.trim().startsWith("//")?" cm":""}" id="L${n+1}"><i>${n+1}</i>${s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}</span>`).join("");
+function setMode(m){
+ stop();mode=m;i=0;
+ document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.m==m));
+ $("rule").textContent=M[m][2]+" Recursion idea: each call handles ONE node and trusts the recursive calls to handle the rest.";
+ m=="insert"?buildInsert():buildTrav(m,M[m][1]);buildLog();
+ $("chips").innerHTML=m=="insert"?'<span class="lbl" style="align-self:center">JUMP TO:</span>'+starts.map(([v,ix])=>`<button class="chip" data-ix="${ix}">insert ${v}</button>`).join(""):"";
+ draw();
+}
+$("chips").onclick=e=>{const b=e.target.closest(".chip");if(b){stop();i=+b.dataset.ix;draw()}};
+function buildLog(){LOG=[];let prev=[],po="";
+ S.forEach((s,ix)=>{const cur=s.stack.slice().reverse();let k=0;while(k<prev.length&&k<cur.length&&prev[k].lb==cur[k].lb)k++;
+  for(let j=prev.length-1;j>=k;j--)LOG.push({ix,d:j,c:"r",t:"← "+prev[j].lb+" returns"});
+  for(let j=k;j<cur.length;j++)LOG.push({ix,d:j,c:"c",t:"→ call "+cur[j].lb});
+  if(s.out.length>po.length)LOG.push({ix,d:cur.length-1,c:"p",t:"★ visit "+s.out.trim().split(" ").pop()+" (printf)"});
+  prev=cur;po=s.out})}
+function draw(){
+ const s=S[i];
+ document.querySelectorAll(".ln.on,.ln.wt").forEach(e=>e.classList.remove("on","wt"));
+ s.stack.forEach((f,k)=>{if(k>0&&f.ln){const w=$("L"+f.ln);if(w)w.classList.add("wt")}});
+ const el=$("L"+s.line);el.classList.add("on");
+ const pre=$("code");pre.scrollTop=el.offsetTop-pre.clientHeight/2;
+ $("note").textContent=s.note;$("out").textContent=s.out;
+ $("pend").textContent=s.pend!=null?`newNode → [ data=${s.pend} | left=NULL | right=NULL ]  (not linked yet)`:"";
+ const ch=s.stack.slice().reverse();
+ $("stk").innerHTML=ch.map((f,k)=>{const top=k==ch.length-1;return `<div class="fr${top?" t":""}" style="margin-left:${k*14}px">${k?"└ ":""}${f.lb} <small>${top?"▶ running line "+f.ln:"⏸ "+(PHT[f.ln]||"waiting for call to return")+" (line "+f.ln+")"}</small></div>`}).join("");
+ const sh=LOG.filter(e=>e.ix<=i).slice(-14);
+ $("log").innerHTML=sh.map(e=>`<div class="lg ${e.c}${e.ix==i?" now":""}">${"  ".repeat(Math.min(e.d,12))}${e.t}</div>`).join("");
+ $("log").scrollTop=1e5;
+ const pathV=ch.slice(0,-1).filter(f=>f.lb.indexOf("createNode")<0).map(f=>{const m=/\((-?\d+)/.exec(f.lb);return m?+m[1]:null}).filter(x=>x!==null);
+ const t=JSON.parse(s.tree);let g="",nodes=[];
+ (function w(n){if(!n)return;nodes.push(n.v);[n.l,n.r].forEach(c=>{if(c){g+=`<line class="ed" x1="${POS[n.v][0]}" y1="${POS[n.v][1]}" x2="${POS[c.v][0]}" y2="${POS[c.v][1]}"/>`;w(c)}})})(t);
+ nodes.forEach(v=>{const c=(v==s.act?" act":"")+(s.vis.includes(v)?" vis":"")+(pathV.includes(v)&&v!=s.act?" path":"");g+=`<g class="nd${c}"><circle cx="${POS[v][0]}" cy="${POS[v][1]}" r="21"/><text x="${POS[v][0]}" y="${POS[v][1]+5}">${v}</text></g>`});
+ if(!nodes.length)g='<text x="230" y="105" fill="var(--mu)" text-anchor="middle">Empty tree (root = NULL)</text>';
+ $("svg").innerHTML=g;
+ $("cnt").textContent=`Step ${i+1} / ${S.length}`;
+ $("pv").disabled=i==0;$("nx").disabled=i==S.length-1;
+}
+function next(){if(i<S.length-1){i++;draw()}else stop()}
+function stop(){clearInterval(timer);timer=null;$("pl").textContent="▶ Play"}
+$("nx").onclick=()=>{stop();next()};$("pv").onclick=()=>{stop();if(i>0){i--;draw()}};
+$("rs").onclick=()=>{stop();i=0;draw()};
+$("pl").onclick=()=>{if(timer){stop();return}if(i==S.length-1)i=0;$("pl").textContent="⏸ Pause";timer=setInterval(next,+$("sp").value);draw()};
+$("sp").onchange=()=>{if(timer){clearInterval(timer);timer=setInterval(next,+$("sp").value)}};
+document.addEventListener("keydown",e=>{if(e.key=="ArrowRight"){stop();next()}if(e.key=="ArrowLeft"){stop();if(i>0){i--;draw()}}});
+try{const t=localStorage.getItem("dstl-th");if(t)document.documentElement.dataset.theme=t}catch(e){}
+setMode("insert");
+</script></body></html>
