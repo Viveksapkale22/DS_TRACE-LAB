@@ -17,7 +17,7 @@ run:()=>S([[2,'fp is a file pointer. It does not point to a file yet.'],[3,'fope
 {t:'M6.2: Reading a file character by character',
 aim:'Aim: Read until end of file (EOF) and count characters and lines.',
 concept:'<p><code>fgetc(fp)</code> reads one character and returns <code>EOF</code> (a special negative value) at the end of the file. Because EOF is negative, the variable that stores the result must be an <code>int</code>, not a <code>char</code>.</p><p>The loop <code>while ((ch = fgetc(fp)) != EOF)</code> reads, stores and tests in one line. A newline character <code>\\n</code> marks the end of a line. Here the file data.txt holds: <code>Hi</code> on line 1 and <code>C</code> on line 2.</p>',
-code:[H,M,'    FILE *fp = fopen("data.txt", "r");','    int ch, chars = 0, lines = 0;','    if (fp == NULL)','        return 1;','    while ((ch = fgetc(fp)) != EOF) {','        chars++;',"        if (ch == '\\n')",'            lines++;','    }','    fclose(fp);','    printf("chars = %d, lines = %d\\n", chars, lines);','    return 0;','}'],
+code:[H,M,'    FILE *fp = fopen("data.txt", "r");','    int ch, chars = 0, lines = 0;','    if (fp == NULL) {','        return 1; }','    while ((ch = fgetc(fp)) != EOF) {','        chars++;',"        if (ch == '\\n') {",'            lines++; }','    }','    fclose(fp);','    printf("chars = %d, lines = %d\\n", chars, lines);','    return 0;','}'],
 inputs:[],
 run(){const f=['H','i','\n','C','\n'],s=B();let c=0,l=0;
 s.add(2,'Opens data.txt for reading. The file contains: Hi, newline, C, newline.','',{fp:'open (read)','data.txt':'Hi | C |'});
@@ -34,18 +34,20 @@ s.add(12,'Prints the counts.','chars = '+c+', lines = '+l+'\n');s.add(13,'Progra
 {t:'M6.3: Reading numbers with fscanf and appending',
 aim:'Aim: Process a file of numbers (sum them), then append the result with mode "a".',
 concept:'<p><code>fscanf(fp, "%d", &amp;x)</code> works like scanf but reads from a file. It returns the <b>number of values read</b>, so <code>== 1</code> means success and anything else (EOF) means stop. This is the standard way to <b>process a file</b> of data.</p><p>Opening with <code>"a"</code> (append) keeps the old content and adds new data at the end. Here nums.txt starts as <code>4 6 10</code>.</p>',
-code:[H,M,'    FILE *fp = fopen("nums.txt", "r");','    int x, sum = 0;','    while (fscanf(fp, "%d", &x) == 1)','        sum += x;','    fclose(fp);','    fp = fopen("nums.txt", "a");   // a = append at the end','    fprintf(fp, " %d", sum);','    fclose(fp);','    printf("Sum = %d\\n", sum);','    return 0;','}'],
+code:[H,M,'    FILE *fp = fopen("nums.txt", "r");','    int x, sum = 0;','    if (fp == NULL) { printf("Cannot open file\\n"); return 1; }','    while (fscanf(fp, "%d", &x) == 1) {','        sum += x; }','    fclose(fp);','    fp = fopen("nums.txt", "a");   // a = append at the end','    if (fp == NULL) { printf("Cannot open file\\n"); return 1; }','    fprintf(fp, " %d", sum);','    fclose(fp);','    printf("Sum = %d\\n", sum);','    return 0;','}'],
 inputs:[],
 run(){const v=[4,6,10],s=B();let sum=0;
 s.add(2,'Opens nums.txt for reading.','',{fp:'open (read)','nums.txt':'4 6 10'});
 s.add(3,'sum starts at 0.','',{sum:0});
-v.forEach(a=>{s.add(4,'fscanf reads the next number ('+a+') and returns 1, because one value was read.','',{x:a});sum+=a;s.add(5,'sum += x gives '+sum,'',{sum})});
-s.add(4,'fscanf finds no more data and returns EOF, which is not 1, so the loop stops.');
-s.add(6,'The reading is finished, so the file is closed.','',{fp:'closed'});
-s.add(7,'Mode "a" (append) reopens the file and keeps the old content. New data goes at the end.','',{fp:'open (append)'});
-s.add(8,'fprintf adds the sum after the old data.','',{'nums.txt':'4 6 10 '+sum});
-s.add(9,'Closed again, so the data is saved.','',{fp:'closed'});
-s.add(10,'Prints on the screen.','Sum = '+sum+'\n');s.add(11,'Program ends.');return s.st}}
+s.add(4,'Check fp == NULL: false, so reading can continue.');
+v.forEach(a=>{s.add(5,'fscanf reads the next number ('+a+') and returns 1, because one value was read.','',{x:a});sum+=a;s.add(6,'sum += x gives '+sum,'',{sum})});
+s.add(5,'fscanf finds no more data and returns EOF, which is not 1, so the loop stops.');
+s.add(7,'The reading is finished, so the file is closed.','',{fp:'closed'});
+s.add(8,'Mode "a" (append) reopens the file and keeps the old content. New data goes at the end.','',{fp:'open (append)'});
+s.add(9,'Check fp == NULL: false, so appending can continue.');
+s.add(10,'fprintf adds the sum after the old data.','',{'nums.txt':'4 6 10 '+sum});
+s.add(11,'Closed again, so the data is saved.','',{fp:'closed'});
+s.add(12,'Prints on the screen.','Sum = '+sum+'\n');s.add(13,'Program ends.');return s.st}}
 ]});
 </script>
 </body>

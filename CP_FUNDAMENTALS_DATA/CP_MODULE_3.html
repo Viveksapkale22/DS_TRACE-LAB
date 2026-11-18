@@ -24,7 +24,7 @@ run:()=>S([[7,'a and b are created in main.','',{a:10,b:20}],[8,'Call by value: 
 {t:'M3.3: Recursion (factorial)',
 aim:'Aim: Watch a function call itself, go down to the base case, then return up the call stack.',
 concept:'<p><b>Recursion</b> means a function calls itself. Every recursive function needs (1) a <b>base case</b> that stops the calls and (2) a recursive step that moves toward it. Each call gets its own copy of the parameters on the <b>call stack</b>.</p><p><code>fact(n) = n * fact(n-1)</code> and <code>fact(1) = 1</code>. The stack chip below shows the active calls.</p>',
-code:[H,'int fact(int n) {','    if (n <= 1)','        return 1;','    return n * fact(n - 1);','}',M,'    int n;','    scanf("%d", &n);','    printf("%d! = %d\\n", n, fact(n));','    return 0;','}'],
+code:[H,'int fact(int n) {','    if (n <= 1) {','        return 1; }','    return n * fact(n - 1);','}',M,'    int n;','    scanf("%d", &n);','    printf("%d! = %d\\n", n, fact(n));','    return 0;','}'],
 inputs:[I('n','n (1 to 6)',4)],
 run(x){const n=Math.min(6,Math.max(1,parseInt(x.n)||1)),s=B();
 const st=k=>{const a=[];for(let i=n;i>=k;i--)a.push('fact('+i+')');return a.join(' > ')};

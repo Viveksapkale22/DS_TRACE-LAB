@@ -25,18 +25,19 @@ run:()=>S([[1,'#define MAX 100: the preprocessor will replace MAX with 100.'],[3
 {t:'M1.3: Arithmetic, relational and logical operators',
 aim:'Aim: Watch / and % on integers, comparisons that give 1 or 0, and the logical operators && || !.',
 concept:'<p><b>Arithmetic</b>: <code>+ - * / %</code>. Dividing two ints drops the decimal part (17/5 = 3). <code>%</code> gives the remainder (17%5 = 2).</p><p><b>Relational</b>: <code>&gt; &lt; &gt;= &lt;= == !=</code> give <b>1 (true)</b> or <b>0 (false)</b>. <b>Logical</b>: <code>&amp;&amp;</code> (both true), <code>||</code> (at least one true), <code>!</code> (reverse). In C, any non-zero value counts as true.</p>',
-code:[H,M,'    int a, b;','    scanf("%d %d", &a, &b);','    printf("a / b = %d, a %% b = %d\\n", a / b, a % b);','    printf("a > b: %d\\n", a > b);','    printf("a == b: %d\\n", a == b);','    printf("both positive: %d\\n", (a > 0) && (b > 0));','    printf("any positive: %d\\n", (a > 0) || (b > 0));','    printf("not a: %d\\n", !a);','    return 0;','}'],
+code:[H,M,'    int a, b;','    scanf("%d %d", &a, &b);','    if (b == 0) { printf("b must not be 0\\n"); return 1; }','    printf("a / b = %d, a %% b = %d\\n", a / b, a % b);','    printf("a > b: %d\\n", a > b);','    printf("a == b: %d\\n", a == b);','    printf("both positive: %d\\n", (a > 0) && (b > 0));','    printf("any positive: %d\\n", (a > 0) || (b > 0));','    printf("not a: %d\\n", !a);','    return 0;','}'],
 inputs:[I('a','a',17),I('b','b',5)],
 run(x){const a=parseInt(x.a)||0,b=parseInt(x.b)||0,s=B();
 s.add(2,'Two int variables are declared.');s.add(3,'scanf stores the typed values.',inp(a+' '+b),{a,b});
-if(b===0){s.add(4,'a / 0 and a % 0 are undefined: a real program crashes here. Try a non-zero b.','Runtime error: division by zero\n');return s.st}
-s.add(4,a+' / '+b+' = '+Math.trunc(a/b)+' (decimal part dropped), '+a+' % '+b+' = '+(a%b)+' (remainder).','a / b = '+Math.trunc(a/b)+', a % b = '+(a%b)+'\n');
-s.add(5,'Check '+a+' > '+b+': '+(a>b?'true, prints 1':'false, prints 0'),'a > b: '+n(a>b)+'\n');
-s.add(6,'Check '+a+' == '+b+' (two equals signs compare, one assigns): '+n(a===b),'a == b: '+n(a===b)+'\n');
-s.add(7,'&& needs BOTH sides true: ('+n(a>0)+') and ('+n(b>0)+') gives '+n(a>0&&b>0),'both positive: '+n(a>0&&b>0)+'\n');
-s.add(8,'|| needs at least ONE side true: gives '+n(a>0||b>0),'any positive: '+n(a>0||b>0)+'\n');
-s.add(9,'! reverses the truth value. '+a+' is '+(a?'non-zero (true)':'zero (false)')+', so !a is '+n(!a),'not a: '+n(!a)+'\n');
-s.add(10,'Program ends.');return s.st}},
+if(b===0){s.add(4,'The guard prevents division by zero, which is undefined in C.','b must not be 0\n');return s.st}
+s.add(4,'b is not zero, so the program can safely continue.');
+s.add(5,a+' / '+b+' = '+Math.trunc(a/b)+' (decimal part dropped), '+a+' % '+b+' = '+(a%b)+' (remainder).','a / b = '+Math.trunc(a/b)+', a % b = '+(a%b)+'\n');
+s.add(6,'Check '+a+' > '+b+': '+(a>b?'true, prints 1':'false, prints 0'),'a > b: '+n(a>b)+'\n');
+s.add(7,'Check '+a+' == '+b+' (two equals signs compare, one assigns): '+n(a===b),'a == b: '+n(a===b)+'\n');
+s.add(8,'&& needs BOTH sides true: ('+n(a>0)+') and ('+n(b>0)+') gives '+n(a>0&&b>0),'both positive: '+n(a>0&&b>0)+'\n');
+s.add(9,'|| needs at least ONE side true: gives '+n(a>0||b>0),'any positive: '+n(a>0||b>0)+'\n');
+s.add(10,'! reverses the truth value. '+a+' is '+(a?'non-zero (true)':'zero (false)')+', so !a is '+n(!a),'not a: '+n(!a)+'\n');
+s.add(11,'Program ends.');return s.st}},
 {t:'M1.4: Unary, assignment, conditional and comma operators',
 aim:'Aim: Understand a++ versus ++a, shortcut assignment, the ternary operator and the comma operator.',
 concept:'<p><b>Post-increment</b> <code>b = a++</code>: use the old value, then add 1. <b>Pre-increment</b> <code>c = ++a</code>: add 1 first, then use the new value.</p><p><b>Assignment shortcuts</b>: <code>a += 3</code> means <code>a = a + 3</code>. <b>Conditional</b>: <code>cond ? x : y</code>. <b>Comma</b>: <code>(e1, e2)</code> runs e1, then e2, and the value is e2. This type of tracing is a very common exam question.</p>',
@@ -59,11 +60,11 @@ s.add(8,'Shift left by 1: '+bin(a)+' becomes '+bin(a<<1).slice(-9)+', the same a
 s.add(9,'Shift right by 1: the last bit falls off, the same as a / 2 (integer).','a >> 1 = '+(a>>1)+'\n');
 s.add(10,'Program ends.');return s.st}},
 {t:'M1.6: Input and output functions',
-aim:'Aim: Use getchar, putchar, scanf, printf, gets and puts, and see why a leftover Enter key causes trouble.',
-concept:'<p><code>getchar()</code> reads one character, <code>putchar(c)</code> prints one. <code>scanf</code> reads formatted values (numbers need <code>&amp;</code>), <code>printf</code> prints them. <code>gets(s)</code> reads a whole line (spaces included), <code>puts(s)</code> prints a string and adds a newline.</p><p>Warning: after you type a character and press Enter, the Enter key stays in the input buffer. A second <code>getchar()</code> removes it. <code>gets()</code> is unsafe and removed from newer C standards (real programs use <code>fgets</code>), but it is part of this syllabus.</p>',
-code:[H,M,'    char ch, name[20];','    int age;','    printf("Enter a character: ");','    ch = getchar();','    getchar();   // remove the Enter key left in the buffer','    putchar(ch);',"    putchar('\\n');",'    printf("Enter your name: ");','    gets(name);','    printf("Enter age: ");','    scanf("%d", &age);','    puts(name);','    printf("Age = %d\\n", age);','    return 0;','}'],
+aim:'Aim: Use getchar, putchar, scanf, printf and fgets, and see why a leftover Enter key causes trouble.',
+concept:'<p><code>getchar()</code> reads one character and <code>putchar(c)</code> prints one. <code>scanf</code> reads formatted values (numbers need <code>&amp;</code>), while <code>printf</code> prints them. <code>fgets(s, size, stdin)</code> safely reads a whole line, including spaces.</p><p>After you type a character and press Enter, the Enter key stays in the input buffer. The second <code>getchar()</code> removes it before <code>fgets</code> reads the name. <code>gets()</code> is shown in some older syllabi, but it is unsafe and should not be used in real C programs.</p>',
+code:[H,M,'    char ch, name[20];','    int age;','    printf("Enter a character: ");','    ch = getchar();','    getchar();   // remove the Enter key left in the buffer','    putchar(ch);',"    putchar('\\n');",'    printf("Enter your name: ");','    fgets(name, sizeof name, stdin);','    printf("Enter age: ");','    scanf("%d", &age);','    printf("Name = %s", name);','    printf("Age = %d\\n", age);','    return 0;','}'],
 inputs:[],
-run:()=>S([[2,'ch will hold one character. name is a character array that can hold a short string.'],[3,'age is an int.'],[4,'The prompt is printed.','Enter a character: '],[5,'getchar() reads one character. You typed R and pressed Enter: R goes into ch, and the Enter (newline) stays waiting in the buffer.',inp('R'),{ch:"'R'"}],[6,'This second getchar() throws away the leftover newline. Without it, gets() below would read an empty line.'],[7,'putchar prints exactly one character.','R'],[8,'Prints a newline character.','\n'],[9,'Prompt for the name.','Enter your name: '],[10,'gets reads the whole line until Enter, spaces included.',inp('Ravi'),{name:'"Ravi"'}],[11,'Prompt for the age.','Enter age: '],[12,'scanf reads a number and needs &age (the address).',inp(21),{age:21}],[13,'puts prints the string and adds a newline by itself.','Ravi\n'],[14,'printf prints text with the number.','Age = 21\n'],[15,'Program ends.']])}
+run:()=>S([[2,'ch will hold one character. name is a character array that can hold a short string.'],[3,'age is an int.'],[4,'The prompt is printed.','Enter a character: '],[5,'getchar() reads one character. You typed R and pressed Enter: R goes into ch, and the Enter (newline) stays waiting in the buffer.',inp('R'),{ch:"'R'"}],[6,'This second getchar() throws away the leftover newline. Without it, fgets() below would read an empty line.'],[7,'putchar prints exactly one character.','R'],[8,'Prints a newline character.','\n'],[9,'Prompt for the name.','Enter your name: '],[10,'fgets safely reads the whole line, spaces included.',inp('Ravi'),{name:'"Ravi\\n"'}],[11,'Prompt for the age.','Enter age: '],[12,'scanf reads a number and needs &age (the address).',inp(21),{age:21}],[13,'printf prints the name. fgets kept the Enter key, so the name already ends with a newline.','Name = Ravi\n'],[14,'printf prints text with the number.','Age = 21\n'],[15,'Program ends.']])}
 ]});
 </script>
 </body>
