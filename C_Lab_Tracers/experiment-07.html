@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Experiment 07 Tracer — Largest of Three (Nested if-else)</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7f9;--fg:#1c2230;--mut:#6b7385;--card:#fff;--bd:#dde1ea;--acc:#2f6fed;--cur:#fff3bf;--fn:#eef3ff;--ok:#1f9d55;--code:#fbfbfd;--warn:#b42318;--chg:#fff3bf;--cj:#ffe3c2;--done:#dff5e6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--fg:#e6e9f0;--mut:#98a1b5;--card:#1b2030;--bd:#2d3447;--acc:#6b9cff;--cur:#4a4120;--fn:#1d2740;--ok:#4cc38a;--code:#171b27;--warn:#ff8a80;--chg:#4a4120;--cj:#4d3820;--done:#1d3b2a}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:14px}
+a{color:var(--acc)}
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:1150px;margin:0 auto 6px;font-size:14px}
+.top .sp{flex:1}.top a{text-decoration:none;border:1px solid var(--bd);background:var(--card);padding:4px 12px;border-radius:8px}
+.top a.off{opacity:.35;pointer-events:none}
+h1{font-size:19px;margin:0 0 4px}
+.hd{max-width:1150px;margin:0 auto 10px}.aim{margin:0;color:var(--mut);font-size:14px}
+.grid{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;max-width:1150px;margin:auto}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 8px}
+#code{position:relative;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;background:var(--code);max-height:62vh;overflow:auto;border-radius:8px;border:1px solid var(--bd)}
+.ln{display:flex;white-space:pre;padding:0 8px}
+.ln i{width:30px;flex:none;color:var(--mut);font-style:normal;user-select:none}
+.ln.fn{background:var(--fn)}.ln.cur{background:var(--cur);box-shadow:inset 3px 0 var(--acc);font-weight:600}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 0}
+button,select{font:inherit;padding:6px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);cursor:pointer}
+select{padding:6px 8px}
+button.p{background:var(--acc);color:#fff;border-color:var(--acc)}button:disabled{opacity:.4;cursor:default}
+#cnt{color:var(--mut);font-size:13px;margin-left:auto}
+#msg{font-size:15px;margin:0 0 6px}#msg.warn{color:var(--warn);font-weight:600}
+#op{font:13px ui-monospace,Menlo,Consolas,monospace;color:var(--ok);margin:0;min-height:20px;white-space:pre-wrap}
+.col{display:flex;flex-direction:column;gap:12px}
+textarea{width:100%;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--code);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:8px;resize:vertical;min-height:70px}
+.help{font-size:13px;color:var(--mut);margin:0 0 6px}
+#wb{margin:8px 0 0;padding:8px 10px;border-radius:8px;border:1px solid var(--warn);color:var(--warn);font-size:13px}
+.about ul{margin:0 0 8px;padding-left:18px;font-size:14px}.about li{margin-bottom:4px}
+.chip{display:inline-block;font-size:12px;border:1px solid var(--bd);background:var(--fn);border-radius:99px;padding:1px 9px;margin:0 4px 4px 0}
+#note{font-size:13px;color:var(--warn);margin:6px 0 0}
+.frame{border:1px solid var(--bd);border-radius:8px;margin-bottom:6px;overflow:hidden}
+.frame.top{border-color:var(--acc)}
+.fh{font:600 12px ui-monospace,monospace;background:var(--fn);padding:3px 8px}.fh em{font-style:normal;color:var(--acc);font-weight:400}
+.frame table{width:100%;border-collapse:collapse;font:13px ui-monospace,Menlo,Consolas,monospace}
+.frame td{padding:2px 8px;border-top:1px solid var(--bd)}.frame td.t{color:var(--mut);width:84px}.frame td.n{width:36%}.frame td.v{font-weight:600;word-break:break-all}
+.frame td.q{color:var(--mut);font-weight:400}.frame tr.chg td{background:var(--chg)}
+.none{color:var(--mut);font-size:13px;padding:4px 8px}
+.arr{display:flex;flex-wrap:wrap;gap:4px}
+.ac{min-width:44px;text-align:center;border:1px solid var(--bd);border-radius:6px;padding:2px 4px;background:var(--card)}
+.ac small{display:block;color:var(--mut);font:11px ui-monospace,monospace}.ac b{display:block;font:600 14px ui-monospace,monospace;min-height:21px}
+.ac em{display:block;font:600 11px ui-monospace,monospace;color:var(--acc);font-style:normal;min-height:15px}
+.ac.done{background:var(--done)}.ac.ci{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}.ac.cj{background:var(--cj);border-color:#e08a00}
+.ac.sw{background:var(--cur);border-color:#e0a800}.ac.nul{border-style:dashed;border-color:var(--warn)}.ac.more{opacity:.5;border-style:dotted}
+.legend{font-size:12px;color:var(--mut);margin-top:6px}.lg{display:inline-block;width:11px;height:11px;border:1px solid var(--bd);border-radius:3px;vertical-align:-1px;margin-right:3px}
+.lg.ci{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}.lg.cj{background:var(--cj)}.lg.sw{background:var(--cur)}.lg.done{background:var(--done)}.lg.nul{border:1px dashed var(--warn)}
+.files{display:flex;gap:8px;flex-wrap:wrap}.file{flex:1 1 180px;border:1px solid var(--bd);border-radius:8px;padding:4px 8px;background:var(--code);min-height:60px}
+.file.gone{opacity:.55;border-style:dashed}.fn{font:600 12px ui-monospace,monospace;margin-bottom:3px}
+.tag{font-weight:400;color:var(--acc);border:1px solid var(--acc);border-radius:99px;padding:0 6px;margin-left:4px;font-size:11px}
+.fl{font:13px ui-monospace,monospace;white-space:pre}.fl.hl{background:var(--cur);font-weight:600}.fl.hl::after{content:'  ◀';color:var(--acc)}
+#fr div{font:13px ui-monospace,monospace;padding:3px 8px;border:1px solid var(--bd);border-radius:6px;margin-bottom:3px}
+#fr div:first-child{background:var(--fn);border-color:var(--acc)}
+#out{margin:0;font:13px ui-monospace,monospace;min-height:48px;max-height:260px;overflow:auto;white-space:pre-wrap;background:#0d1117;color:#7ee787;padding:8px;border-radius:8px}
+#out .ty{color:#79c0ff}
+.legend2{font-size:12px;color:var(--mut);margin:4px 0 0}
+</style></head><body>
+<div class="top"><a href="../ds_trace_lab_c_experiments_new.html">☰ All experiments</a><span class="sp"></span><a href="experiment-06.html" class="">◀ Prev experiment</a><a href="experiment-08.html" class="">Next experiment ▶</a></div>
+<div class="hd"><h1 id="h1"></h1><p class="aim" id="aim"></p></div>
+<div class="grid">
+ <div class="col">
+  <div class="card"><h2>Source code <span id="where" style="text-transform:none;letter-spacing:0"></span></h2><div id="code"></div>
+   <div class="ctrl"><button id="pv">◀ Back</button><button id="nx" class="p">Next ▶</button><button id="au">Auto play</button><button id="rs">Reset</button>
+    <select id="sp" title="Auto-play speed"><option value="1700">Slow</option><option value="1100" selected>Normal</option><option value="450">Fast</option></select><span id="cnt"></span></div>
+   <input id="sl" type="range" min="0" value="0" style="width:100%;margin-top:8px"></div>
+  <div class="card"><h2>Keyboard input (what the user types)</h2><p class="help" id="ih"></p>
+   <textarea id="ta" spellcheck="false"></textarea>
+   <div class="ctrl"><button id="run" class="p">▶ Run with this input</button><button id="sample">Sample input</button></div>
+   <div id="wb" hidden></div></div>
+  <div class="card about"><h2>About this experiment</h2><div id="topics"></div><ul id="concepts"></ul><p id="note" hidden></p>
+   <p class="legend2">Colour guide: yellow line = line running now · blue-tinted lines = the function being executed · yellow table row = value just changed.</p></div>
+ </div>
+ <div class="col">
+  <div class="card"><h2>What happens on this line</h2><p id="msg"></p><p id="op"></p></div>
+  <div class="card"><h2>Variables in memory (per function)</h2><div id="vars"></div></div>
+  <div class="card" id="xcard" hidden><h2 id="xt"></h2><div id="xb"></div></div>
+  <div class="card"><h2>Call stack (top = running function)</h2><div id="fr"></div></div>
+  <div class="card"><h2>Console output <span style="text-transform:none;letter-spacing:0">(blue = typed by the user)</span></h2><pre id="out"></pre></div>
+ </div>
+</div>
+<script>
+const SRC=["#include <stdio.h>", "", "int main()", "{", "    int a, b, c;", "", "    printf(\"Enter three numbers: \");", "    scanf(\"%d %d %d\", &a, &b, &c);", "", "    if (a > b) {", "        if (a > c)", "            printf(\"Largest number = %d\\n\", a);", "        else", "            printf(\"Largest number = %d\\n\", c);", "    }", "    else {", "        if (b > c)", "            printf(\"Largest number = %d\\n\", b);", "        else", "            printf(\"Largest number = %d\\n\", c);", "    }", "", "    return 0;", "}"];
+var EXP;
+/* ===================== TRACER CORE (logic only, no DOM) ===================== */
+const F=Math.fround;
+const fv=x=>(x===null||x===undefined)?'?':String(+Number(x).toPrecision(7));
+const fx=(x,d)=>{d=d===undefined?2:d;return isFinite(x)?x.toFixed(d):(isNaN(x)?'nan':(x<0?'-inf':'inf'))};
+const i32=x=>x|0;
+const fmtV=(t,v)=>{if(v===null||v===undefined)return '?';if(t==='float')return fv(v);if(t==='str')return '"'+v+'"';if(t==='char')return "'"+v+"'";return String(v)};
+class NoInput extends Error{}
+class BadInput extends Error{}
+class TooLong extends Error{}
+
+/* Reader = what scanf / fgets / fscanf see (keyboard text or file text) */
+class Reader{
+ constructor(t){this.t=t;this.p=0;this.ep=0}
+ ws(){while(this.p<this.t.length&&/\s/.test(this.t[this.p]))this.p++}
+ atEOF(){const s=this.p;this.ws();const r=this.p>=this.t.length;this.p=s;return r}
+ tok(){this.ws();if(this.p>=this.t.length)throw new NoInput();const s=this.p;while(this.p<this.t.length&&!/\s/.test(this.t[this.p]))this.p++;return this.t.slice(s,this.p)}
+ int(){const k=this.tok();if(!/^[+-]?\d+$/.test(k))throw new BadInput('scanf("%d") expected a whole number but found "'+k+'". Fix the Input box and press Run.');const v=parseInt(k,10);if(v>2147483647||v<-2147483648)throw new BadInput('"'+k+'" does not fit in a 32-bit int (range -2147483648 to 2147483647).');return v}
+ float(){const k=this.tok();if(!/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(k))throw new BadInput('scanf("%f") expected a number but found "'+k+'". Fix the Input box and press Run.');return F(parseFloat(k))}
+ word(max){return this.tok().slice(0,max)}
+ line(max){if(this.p>=this.t.length)throw new NoInput();let e=this.t.indexOf('\n',this.p);let end=e<0?this.t.length:e+1;if(end-this.p>max-1)end=this.p+max-1;const s=this.t.slice(this.p,end);this.p=end;return s}
+ /* text the terminal would have echoed while the user typed (whole lines) */
+ echoText(){if(this.p-1<this.ep)return '';let e=this.t.indexOf('\n',Math.max(this.p-1,0));if(e<0)e=this.t.length;const s=this.t.slice(this.ep,e)+'\n';this.ep=e+1;return s}
+}
+
+/* find every function: name -> [first line, closing-brace line] (1-based) */
+function computeR(src){const R={};for(let i=0;i<src.length;i++){const t=src[i];
+ if(/^[A-Za-z_][\w\s\*]*\(.*\)\s*$/.test(t)&&!/;\s*$/.test(t)){const nm=t.slice(0,t.indexOf('(')).trim().split(/[\s\*]+/).pop();let j=i+1;while(j<src.length&&src[j]!=='}')j++;R[nm]=[i+1,j+1]}}return R}
+const R=computeR(SRC);
+const fnOfLine=l=>{for(const k in R)if(l>=R[k][0]&&l<=R[k][1])return k;return null};
+
+function runBuild(inputText){
+ let txt=String(inputText).replace(/\r\n?/g,'\n');if(txt.length&&!txt.endsWith('\n'))txt+='\n';
+ const c={steps:[],out:'',frames:[{name:'main()',vars:{}}],extra:null,cur:1,rd:new Reader(txt),R};
+ const clone=o=>JSON.parse(JSON.stringify(o));
+ c.ln=(s,n)=>{n=n||1;let k=0;for(let i=0;i<SRC.length;i++)if(SRC[i].includes(s)&&++k===n)return i+1;throw new Error('line not found: '+s)};
+ c.lnIn=(fn,s,n)=>{n=n||1;let k=0;const [a,b]=R[fn];for(let i=a-1;i<b;i++)if(SRC[i].includes(s)&&++k===n)return i+1;throw new Error('line not found in '+fn+': '+s)};
+ c.lnEq=(s,n)=>{n=n||1;let k=0;for(let i=0;i<SRC.length;i++)if(SRC[i].trim()===s&&++k===n)return i+1;throw new Error('line not found: '+s)};
+ c.span=(s,k,n)=>{const a=c.ln(s,n);return [a,a+k-1]};
+ c.spanIn=(fn,s,k,n)=>{const a=c.lnIn(fn,s,n);return [a,a+k-1]};
+ c.S=(line,msg,op)=>{if(c.steps.length>=4000)throw new TooLong();c.cur=Array.isArray(line)?line[0]:line;
+  c.steps.push({line,msg,op:op||'',frames:clone(c.frames),extra:c.extra?clone(c.extra):null,out:c.out})};
+ c.decl=(n,t,v)=>{c.frames[0].vars[n]={t:t,v:v===undefined?null:v}};
+ c.set=(n,v)=>{c.frames[0].vars[n].v=v};
+ c.get=n=>c.frames[0].vars[n].v;
+ c.call=(label,params)=>{c.frames.unshift({name:label,vars:{}});(params||[]).forEach(p=>c.decl(p[0],p[1],p[2]))};
+ c.ret=()=>{c.frames.shift()};
+ c.print=s=>{c.out+=s};
+ c.typed=()=>{const s=c.rd.echoText();if(s)c.out+='\u0001'+s+'\u0002'};
+ c.scanf=(line,specs,extra)=>{c.cur=line;const parts=[];
+  for(const sp of specs){const n=sp[0],t=sp[1];const v=t==='int'?c.rd.int():t==='float'?c.rd.float():c.rd.word(sp[2]||49);c.set(n,v);parts.push(n+' = '+fmtV(t==='word'?'str':t,v))}
+  c.typed();c.S(line,'scanf pauses the program and waits for the keyboard. It read what you typed and stored it into: '+parts.join(', ')+'.'+(extra?' '+extra:''),parts.join(' ;  '))};
+ const stop=(msg)=>{c.steps.push({line:c.cur,msg:msg,op:'',frames:clone(c.frames),extra:c.extra?clone(c.extra):null,out:c.out,halt:true})};
+ try{EXP.build(c)}
+ catch(e){
+  if(e instanceof NoInput)stop('⌨ The program is WAITING here: scanf/fgets needs more keyboard input, but the Input box has run out of values. Add more input below and press Run.');
+  else if(e instanceof BadInput)stop('⚠ '+e.message);
+  else if(e instanceof TooLong)stop('⏹ Trace stopped after 4000 steps. Use a smaller input (fewer lines / elements) and press Run.');
+  else throw e;
+ }
+ return c.steps;
+}
+
+EXP={no:7,
+title:'Largest of Three (Nested if-else)',
+short:'Decide which of a, b, c is largest with nested if-else',
+aim:'To write a program to find the largest of three numbers using nested if-else statements.',
+topics:['if-else','Nested decisions','Comparison operators'],
+concepts:['A nested if-else = an if inside another if/else block.','Step 1: compare a and b. The winner then only needs to be compared with c.','If a > b: a vs c. Otherwise (b ≥ a): b vs c. Only ONE printf ever runs.'],
+input:'12 45 30',
+inputHelp:'Type three whole numbers separated by spaces, e.g. 12 45 30',
+build(c){const L=c.ln;
+ c.S(L('#include'),'The preprocessor adds stdio.h.');
+ c.S(L('int main()'),'Program starts at main().');
+ ['a','b','c'].forEach(n=>c.decl(n,'int'));
+ c.S(L('int a, b, c'),'Declare three int variables.');
+ c.print('Enter three numbers: ');
+ c.S(L('printf("Enter'),'Print the prompt.','prints: Enter three numbers: ');
+ c.scanf(L('scanf'),[['a','int'],['b','int'],['c','int']]);
+ const a=c.get('a'),b=c.get('b'),cc=c.get('c');
+ const P=(v)=>{c.print(`Largest number = ${v}\n`)};
+ c.S(L('if (a > b)'),`OUTER if: is a > b? ${a} > ${b} → ${a>b?'TRUE. Enter this block; a is still in the race, only c can beat it.':'FALSE. Skip this block and jump to the else part; now b is the leader.'}`,`${a} > ${b}  →  ${a>b}`);
+ if(a>b){
+  c.S(L('if (a > c)'),`INNER if: is a > c? ${a} > ${cc} → ${a>cc?'TRUE, so a is the largest.':'FALSE, so c is the largest.'}`,`${a} > ${cc}  →  ${a>cc}`);
+  if(a>cc){P(a);c.S(L('printf("Largest number = %d\\n", a)'),`Print a = ${a}. The else part is skipped.`,`prints: Largest number = ${a}`)}
+  else{c.S(L('else',1),'The inner condition was false, so the else branch runs.');P(cc);c.S(L('printf("Largest number = %d\\n", c)',1),`Print c = ${cc}.`,`prints: Largest number = ${cc}`)}
+ }else{
+  c.S(L('else {'),'a > b was false, so the whole first block is skipped and the else block runs.');
+  c.S(L('if (b > c)'),`INNER if: is b > c? ${b} > ${cc} → ${b>cc?'TRUE, so b is the largest.':'FALSE, so c is the largest.'}`,`${b} > ${cc}  →  ${b>cc}`);
+  if(b>cc){P(b);c.S(L('printf("Largest number = %d\\n", b)'),`Print b = ${b}.`,`prints: Largest number = ${b}`)}
+  else{c.S(L('else',3),'The inner condition was false, so its else branch runs.');P(cc);c.S(L('printf("Largest number = %d\\n", c)',2),`Print c = ${cc}.`,`prints: Largest number = ${cc}`)}
+ }
+ c.S(L('return 0'),'return 0 = success.','return 0');
+ c.S(SRC.length,'End of main(). Program exits.');
+}};
+
+/* ===================== TRACER UI ===================== */
+(function(){
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+let steps=[],i=0,timer=null;
+const codeEl=$('code');
+codeEl.innerHTML=SRC.map((t,k)=>`<div class="ln" id="l${k+1}"><i>${k+1}</i><span></span></div>`).join('');
+codeEl.querySelectorAll('.ln span').forEach((s,k)=>s.textContent=SRC[k]);
+$('h1').textContent='Experiment '+String(EXP.no).padStart(2,'0')+' — '+EXP.title;
+$('aim').textContent='Aim: '+EXP.aim;
+$('concepts').innerHTML=EXP.concepts.map(c=>'<li>'+esc(c)+'</li>').join('');
+$('topics').innerHTML=EXP.topics.map(t=>'<span class="chip">'+esc(t)+'</span>').join('');
+if(EXP.note){$('note').textContent='⚠ '+EXP.note;$('note').hidden=false}
+$('ih').textContent=EXP.inputHelp;
+const ta=$('ta');ta.value=EXP.input;
+
+const disp=ch=>ch==='\0'?'\\0':ch==='\n'?'\\n':ch===' '?'␣':ch;
+function renderArray(x){
+ if(x.n===null)return '<div class="none">n is not known yet – nothing stored in the array.</div>';
+ if(!x.data.length)return '<div class="none">n = '+x.n+' → no elements to show.</div>';
+ let h='<div class="arr">';
+ x.data.forEach((v,k)=>{const cl=['ac'];if(k<x.done)cl.push('done');if(x.i===k)cl.push('ci');if(x.j===k)cl.push('cj');if(x.sw&&x.sw.indexOf(k)>=0)cl.push('sw');
+  h+=`<div class="${cl.join(' ')}"><small>[${k}]</small><b>${v===null?'?':v}</b><em>${[x.i===k?'i':'',x.j===k?'j':''].filter(Boolean).join(' ')||'&nbsp;'}</em></div>`});
+ return h+'</div><div class="legend"><span class="lg ci"></span>i &nbsp;<span class="lg cj"></span>j &nbsp;<span class="lg sw"></span>being swapped &nbsp;<span class="lg done"></span>final position</div>';
+}
+function renderString(x){
+ if(x.fresh)return '<div class="none">str holds 100 bytes of garbage – no text yet.</div>';
+ let h='<div class="arr">';
+ x.chars.forEach((ch,k)=>{const cl=['ac'];if(ch==='\0')cl.push('nul');if(x.ptr===k)cl.push('cj');
+  h+=`<div class="${cl.join(' ')}"><small>[${k}]</small><b>${esc(disp(ch))}</b><em>${x.ptr===k?'ptr':'&nbsp;'}</em></div>`});
+ h+='<div class="ac more"><small>…</small><b>⋯</b><em>unused</em></div></div>';
+ if(x.ptr!==null&&x.ptr!==undefined){const ch=x.chars[x.ptr];h+=`<div class="legend">ptr points to str[${x.ptr}] &nbsp;→&nbsp; *ptr = '${esc(disp(ch))}'</div>`}
+ return h+'<div class="legend"><span class="lg cj"></span>pointer position &nbsp;<span class="lg nul"></span>\'\\0\' end-of-string marker</div>';
+}
+function renderFiles(x){
+ return '<div class="files">'+Object.keys(x.files).map(n=>{const f=x.files[n];
+  let body;if(f.c===null)body='<div class="none">(file does not exist)</div>';else if(f.c==='')body='<div class="none">(empty file)</div>';
+  else body=f.c.split('\n').slice(0,-1).map((ln,k)=>`<div class="fl${x.hl&&x.hl.file===n&&x.hl.line===k?' hl':''}">${esc(ln)}</div>`).join('');
+  return `<div class="file${f.c===null?' gone':''}"><div class="fn">📄 ${esc(n)} ${f.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')}</div>${body}</div>`}).join('')+'</div>';
+}
+function consoleHtml(o){return o?esc(o).replace(/\u0001/g,'<span class="ty">').replace(/\u0002/g,'</span>'):' '}
+
+function render(){
+ const s=steps[i],prev=i>0?steps[i-1]:null;
+ const a=Array.isArray(s.line)?s.line[0]:s.line,b=Array.isArray(s.line)?s.line[1]:s.line;
+ const fn=fnOfLine(a),rng=fn?R[fn]:null;
+ for(let k=1;k<=SRC.length;k++)$('l'+k).className='ln'+(rng&&k>=rng[0]&&k<=rng[1]?' fn':'')+(k>=a&&k<=b?' cur':'');
+ const el=$('l'+a);if(el.offsetTop<codeEl.scrollTop+20||el.offsetTop+el.offsetHeight>codeEl.scrollTop+codeEl.clientHeight-20)codeEl.scrollTop=Math.max(0,el.offsetTop-codeEl.clientHeight/3);
+ $('where').textContent=fn?'— inside '+fn+'()':'— before main() runs';
+ $('msg').textContent=s.msg;$('msg').className=s.halt?'warn':'';$('op').textContent=s.op?'⚙ '+s.op:'';
+ let h='';
+ s.frames.forEach((f,fi)=>{
+  const depth=s.frames.length-1-fi,pf=prev&&prev.frames[prev.frames.length-1-depth],same=pf&&pf.name===f.name;
+  const keys=Object.keys(f.vars);let rows='';
+  keys.forEach(k=>{const v=f.vars[k],txt=fmtV(v.t,v.v);let chg=false;
+   if(prev){if(!same||!pf.vars[k])chg=true;else chg=fmtV(pf.vars[k].t,pf.vars[k].v)!==txt}
+   rows+=`<tr class="${chg?'chg':''}"><td class="t">${esc(v.t)}</td><td class="n">${esc(k)}</td><td class="v${v.v===null?' q':''}">${esc(txt)}</td></tr>`});
+  h+=`<div class="frame${fi===0?' top':''}"><div class="fh">${esc(f.name)}${fi===0?' <em>← running</em>':''}</div>${keys.length?'<table>'+rows+'</table>':'<div class="none">no variables yet</div>'}</div>`});
+ $('vars').innerHTML=h;
+ const x=s.extra;$('xcard').hidden=!x;
+ if(x){$('xt').textContent=x.title;$('xb').innerHTML=x.type==='array'?renderArray(x):x.type==='string'?renderString(x):renderFiles(x)}
+ $('fr').innerHTML=s.frames.map(f=>`<div>${esc(f.name)}</div>`).join('');
+ $('out').innerHTML=consoleHtml(s.out);$('out').scrollTop=1e9;
+ $('cnt').textContent=`Step ${i+1} / ${steps.length}`;$('sl').value=i;
+ $('pv').disabled=i===0;$('nx').disabled=i===steps.length-1;if(i===steps.length-1)stop();
+}
+function go(n){i=Math.max(0,Math.min(steps.length-1,n));render()}
+function stop(){clearInterval(timer);timer=null;$('au').textContent='Auto play'}
+function run(){stop();steps=runBuild(ta.value);i=0;$('sl').max=steps.length-1;const last=steps[steps.length-1];
+ const wb=$('wb');if(last.halt){wb.textContent=last.msg;wb.hidden=false}else wb.hidden=true;render()}
+$('nx').onclick=()=>go(i+1);$('pv').onclick=()=>go(i-1);$('rs').onclick=()=>{stop();go(0)};
+$('sl').oninput=e=>go(+e.target.value);
+$('au').onclick=()=>{if(timer){stop();return}if(i===steps.length-1)go(0);$('au').textContent='Pause';timer=setInterval(()=>go(i+1),+$('sp').value)};
+$('sp').onchange=()=>{if(timer){clearInterval(timer);timer=setInterval(()=>go(i+1),+$('sp').value)}};
+$('run').onclick=run;$('sample').onclick=()=>{ta.value=EXP.input;run()};
+document.addEventListener('keydown',e=>{if(e.target===ta)return;if(e.key==='ArrowRight')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+run();
+})();
+
+</script></body></html>

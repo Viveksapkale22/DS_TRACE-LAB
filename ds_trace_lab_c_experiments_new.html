@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>C Programming Lab — Code Tracer (Master Index)</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f7f9;--fg:#1c2230;--mut:#6b7385;--card:#fff;--bd:#dde1ea;--acc:#2f6fed;--fn:#eef3ff;--hov:#f1f5ff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--fg:#e6e9f0;--mut:#98a1b5;--card:#1b2030;--bd:#2d3447;--acc:#6b9cff;--fn:#1d2740;--hov:#202842}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px}
+.wrap{max-width:1100px;margin:auto}
+h1{font-size:22px;margin:0 0 2px}.sub{color:var(--mut);margin:0 0 14px;font-size:14px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+input{font:inherit;padding:7px 12px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);min-width:240px;flex:1;max-width:420px}
+.hint{color:var(--mut);font-size:13px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding:9px 12px;border-bottom:1px solid var(--bd);background:var(--fn)}
+td{padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:top}tr:last-child td{border-bottom:0}
+tbody tr{cursor:pointer}tbody tr:hover{background:var(--hov)}
+td.no{font:600 15px ui-monospace,Menlo,monospace;color:var(--acc);width:52px}
+a.tt{font-weight:600;color:var(--fg);text-decoration:none}a.tt:hover{color:var(--acc)}
+.aim{color:var(--mut);font-size:13px;margin-top:2px}
+.chip{display:inline-block;font-size:12px;border:1px solid var(--bd);background:var(--fn);border-radius:99px;padding:1px 9px;margin:0 4px 4px 0}
+td.st{font:13px ui-monospace,monospace;color:var(--mut);white-space:nowrap;width:70px}td.go{width:130px;white-space:nowrap}
+.btn{display:inline-block;background:var(--acc);color:#fff;text-decoration:none;padding:5px 12px;border-radius:8px;font-size:14px}
+.how{margin-top:14px;font-size:14px;color:var(--mut)}.how b{color:var(--fg)}
+#none{padding:14px;color:var(--mut)}
+</style></head><body><div class="wrap">
+<h1>C Programming Lab — Line-by-Line Code Tracers</h1>
+<p class="sub">Department of Humanities &amp; Science · FE / Sem I · 12 experiments. Click any row to open its step-by-step tracer.</p>
+<div class="bar"><input id="q" type="search" placeholder="Search experiment, topic or keyword…" autocomplete="off"><span class="hint" id="c">12 experiments</span></div>
+<div class="card"><table><thead><tr><th>Expt</th><th>Experiment</th><th>Concepts</th><th>Steps</th><th></th></tr></thead><tbody id="tb">
+<tr data-href="C_Lab_Tracers/experiment-01.html" data-s="arithmetic on two numbers to write a program to accept two numbers and print the sum, difference, division and multiplication of two numbers. scanf / printf arithmetic operators int variables">
+<td class="no">01</td><td><a class="tt" href="C_Lab_Tracers/experiment-01.html">Arithmetic on Two Numbers</a><div class="aim">To write a program to accept two numbers and print the sum, difference, division and multiplication of two numbers.</div></td>
+<td class="tp"><span class="chip">scanf / printf</span><span class="chip">Arithmetic operators</span><span class="chip">int variables</span></td><td class="st">13</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-01.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-02.html" data-s="simple interest to write a program to calculate simple interest (si) by taking input from user. float variables scanf(&quot;%f&quot;) formula evaluation">
+<td class="no">02</td><td><a class="tt" href="C_Lab_Tracers/experiment-02.html">Simple Interest</a><div class="aim">To write a program to calculate Simple Interest (SI) by taking input from user.</div></td>
+<td class="tp"><span class="chip">float variables</span><span class="chip">scanf(&quot;%f&quot;)</span><span class="chip">Formula evaluation</span></td><td class="st">13</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-02.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-03.html" data-s="largest &amp; smallest of three (ternary operator) to write a program to determine the smallest and largest of three integer quantities using the conditional (ternary) operator. conditional (?:) operator nested conditions comparison operators">
+<td class="no">03</td><td><a class="tt" href="C_Lab_Tracers/experiment-03.html">Largest &amp; Smallest of Three (Ternary Operator)</a><div class="aim">To write a program to determine the smallest and largest of three integer quantities using the conditional (ternary) operator.</div></td>
+<td class="tp"><span class="chip">Conditional (?:) operator</span><span class="chip">Nested conditions</span><span class="chip">Comparison operators</span></td><td class="st">15</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-03.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-04.html" data-s="number pattern using nested loops to write a program to display the following pattern by asking the user for number of lines (1, 12, 123, 1234, 12345, 123456). nested for loops pattern printing loop counters">
+<td class="no">04</td><td><a class="tt" href="C_Lab_Tracers/experiment-04.html">Number Pattern using Nested Loops</a><div class="aim">To write a program to display the following pattern by asking the user for number of lines (1, 12, 123, 1234, 12345, 123456).</div></td>
+<td class="tp"><span class="chip">Nested for loops</span><span class="chip">Pattern printing</span><span class="chip">Loop counters</span></td><td class="st">68</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-04.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-05.html" data-s="first n natural numbers (do-while) to write a program to display the first n natural numbers using a do-while loop. do-while loop exit-controlled loop increment (i++)">
+<td class="no">05</td><td><a class="tt" href="C_Lab_Tracers/experiment-05.html">First n Natural Numbers (do-while)</a><div class="aim">To write a program to display the first n natural numbers using a do-while loop.</div></td>
+<td class="tp"><span class="chip">do-while loop</span><span class="chip">Exit-controlled loop</span><span class="chip">Increment (i++)</span></td><td class="st">23</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-05.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-06.html" data-s="sum &amp; product of digits (while loop) to write a program to find the sum and product of all digits of a user-entered number using a while loop. while loop modulus (%) operator integer division (/)">
+<td class="no">06</td><td><a class="tt" href="C_Lab_Tracers/experiment-06.html">Sum &amp; Product of Digits (while loop)</a><div class="aim">To write a program to find the sum and product of all digits of a user-entered number using a while loop.</div></td>
+<td class="tp"><span class="chip">while loop</span><span class="chip">Modulus (%) operator</span><span class="chip">Integer division (/)</span></td><td class="st">30</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-06.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-07.html" data-s="largest of three (nested if-else) to write a program to find the largest of three numbers using nested if-else statements. if-else nested decisions comparison operators">
+<td class="no">07</td><td><a class="tt" href="C_Lab_Tracers/experiment-07.html">Largest of Three (Nested if-else)</a><div class="aim">To write a program to find the largest of three numbers using nested if-else statements.</div></td>
+<td class="tp"><span class="chip">if-else</span><span class="chip">Nested decisions</span><span class="chip">Comparison operators</span></td><td class="st">11</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-07.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-08.html" data-s="calculator using user-defined functions to write a c program to perform addition, subtraction, multiplication and division of two numbers using user-defined functions. functions prototypes pass by value return">
+<td class="no">08</td><td><a class="tt" href="C_Lab_Tracers/experiment-08.html">Calculator using User-Defined Functions</a><div class="aim">To write a C program to perform addition, subtraction, multiplication and division of two numbers using user-defined functions.</div></td>
+<td class="tp"><span class="chip">Functions</span><span class="chip">Prototypes</span><span class="chip">Pass by value</span><span class="chip">return</span></td><td class="st">25</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-08.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-09.html" data-s="factorial using a function write a c program to find the factorial of a number using a function. functions with return value for loop local variables">
+<td class="no">09</td><td><a class="tt" href="C_Lab_Tracers/experiment-09.html">Factorial using a Function</a><div class="aim">Write a C program to find the factorial of a number using a function.</div></td>
+<td class="tp"><span class="chip">Functions with return value</span><span class="chip">for loop</span><span class="chip">Local variables</span></td><td class="st">25</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-09.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-10.html" data-s="sort array in descending order write a c program to sort array elements in descending order. arrays nested loops swapping with temp">
+<td class="no">10</td><td><a class="tt" href="C_Lab_Tracers/experiment-10.html">Sort Array in Descending Order</a><div class="aim">Write a C program to sort array elements in descending order.</div></td>
+<td class="tp"><span class="chip">Arrays</span><span class="chip">Nested loops</span><span class="chip">Swapping with temp</span></td><td class="st">78</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-10.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-11.html" data-s="string length using pointers to write a c program using pointers to determine the length of a character string. strings &amp; &#x27;\0&#x27; pointers (char *) fgets / strcspn">
+<td class="no">11</td><td><a class="tt" href="C_Lab_Tracers/experiment-11.html">String Length using Pointers</a><div class="aim">To write a C program using pointers to determine the length of a character string.</div></td>
+<td class="tp"><span class="chip">Strings &amp; &#x27;\0&#x27;</span><span class="chip">Pointers (char *)</span><span class="chip">fgets / strcspn</span></td><td class="st">47</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-11.html">Open tracer ▶</a></td></tr>
+<tr data-href="C_Lab_Tracers/experiment-12.html" data-s="file handling – student database to design and implement a c program that demonstrates file handling by maintaining a simple student database (add, display and update records, stored permanently in a file). file handling (file *) struct fopen / fprintf / fscanf / fclose switch menu">
+<td class="no">12</td><td><a class="tt" href="C_Lab_Tracers/experiment-12.html">File Handling – Student Database</a><div class="aim">To design and implement a C program that demonstrates file handling by maintaining a simple student database (add, display and update records, stored permanently in a file).</div></td>
+<td class="tp"><span class="chip">File handling (FILE *)</span><span class="chip">struct</span><span class="chip">fopen / fprintf / fscanf / fclose</span><span class="chip">switch menu</span></td><td class="st">154</td><td class="go"><a class="btn" href="C_Lab_Tracers/experiment-12.html">Open tracer ▶</a></td></tr>
+</tbody></table><div id="none" hidden>No experiment matches your search.</div></div>
+<p class="how"><b>How to use a tracer:</b> press <b>Next ▶</b> (or the → key) to run one step of the program. The highlighted line is the one executing, the right side shows variables, the call stack and the console. Change the <b>keyboard input</b> box and press <b>Run</b> to trace the same program with your own values. Keep this file next to the <b>C_Lab_Tracers</b> folder.</p>
+</div>
+<script>
+const rows=[...document.querySelectorAll('#tb tr')];
+rows.forEach(r=>r.addEventListener('click',e=>{if(e.target.closest('a'))return;location.href=r.dataset.href}));
+document.getElementById('q').addEventListener('input',e=>{const v=e.target.value.trim().toLowerCase();let n=0;
+ rows.forEach(r=>{const ok=!v||r.dataset.s.includes(v);r.hidden=!ok;if(ok)n++});
+ document.getElementById('c').textContent=n+' experiment'+(n===1?'':'s');document.getElementById('none').hidden=n>0});
+</script></body></html>
