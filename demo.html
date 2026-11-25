@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Viewer</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #eef1f5;
+    color: #222;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    background: #172033;
+    color: white;
+    padding: 17px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.header h2 {
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.header span {
+    font-size: 12px;
+    color: #aab5c7;
+}
+
+/* Toolbar */
+.toolbar {
+    background: #26344c;
+    color: white;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+button, .upload-label {
+    background: #40516d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+button:hover, .upload-label:hover {
+    background: #5875a2;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.upload-label {
+    background: #2563eb;
+}
+
+.upload-label:hover {
+    background: #1d4ed8;
+}
+
+#fileInput {
+    display: none;
+}
+
+.page-info {
+    font-size: 14px;
+    min-width: 90px;
+    text-align: center;
+}
+
+.zoom-info {
+    font-size: 13px;
+    min-width: 48px;
+    text-align: center;
+}
+
+/* Viewer */
+.viewer {
+    padding: 25px 12px;
+    min-height: calc(100vh - 130px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#pdfContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    background: white;
+    box-shadow: 0 4px 22px rgba(0,0,0,0.13);
+    border-radius: 3px;
+}
+
+.placeholder {
+    text-align: center;
+    background: white;
+    padding: 65px 25px;
+    border-radius: 15px;
+    width: min(100%, 520px);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.07);
+    margin-top: 65px;
+}
+
+.placeholder .icon {
+    font-size: 55px;
+    margin-bottom: 20px;
+}
+
+.placeholder h2 {
+    margin-bottom: 12px;
+    color: #172033;
+}
+
+.placeholder p {
+    color: #788397;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+#status {
+    text-align: center;
+    color: #64748b;
+    padding: 10px;
+    font-size: 13px;
+}
+
+/* Mobile */
+@media(max-width: 600px) {
+    .header {
+        padding: 14px;
+    }
+
+    .header h2 {
+        font-size: 17px;
+    }
+
+    .toolbar {
+        gap: 7px;
+        padding: 10px 6px;
+    }
+
+    button, .upload-label {
+        padding: 9px 10px;
+        font-size: 12px;
+    }
+
+    .viewer {
+        padding: 12px 5px;
+    }
+
+    .placeholder {
+        padding: 45px 18px;
+        margin-top: 35px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <h2>📄 PDF Viewer</h2>
+    <span>Smart Document Reader</span>
+</header>
+
+<div class="toolbar">
+
+    <label class="upload-label" for="fileInput">
+        📂 Open PDF
+    </label>
+    <input type="file" id="fileInput" accept=".pdf,application/pdf">
+
+    <button id="prevBtn" disabled>❮</button>
+
+    <div class="page-info">
+        <span id="pageNum">0</span> /
+        <span id="pageCount">0</span>
+    </div>
+
+    <button id="nextBtn" disabled>❯</button>
+
+    <button id="zoomOut" disabled>−</button>
+
+    <span class="zoom-info" id="zoomValue">100%</span>
+
+    <button id="zoomIn" disabled>+</button>
+
+    <button id="fitBtn" disabled>Fit</button>
+
+    <button id="fullBtn">⛶</button>
+
+</div>
+
+<div id="status">Choose a PDF file to start reading.</div>
+
+<main class="viewer" id="viewer">
+
+    <div id="pdfContainer">
+
+        <div class="placeholder" id="placeholder">
+            <div class="icon">📕</div>
+            <h2>Welcome to PDF Viewer</h2>
+            <p>
+                Open your PDF document to read it
+                comfortably on your laptop, tablet or mobile.
+                <br><br>
+                You can also drag and drop your PDF here.
+            </p>
+        </div>
+
+        <canvas id="pdfCanvas" hidden></canvas>
+
+    </div>
+
+</main>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let pdfDoc = null;
+let pageNum = 1;
+let scale = 1;
+let baseScale = 1;
+let renderTask = null;
+let renderId = 0;
+
+const canvas = document.getElementById("pdfCanvas");
+const ctx = canvas.getContext("2d");
+
+const fileInput = document.getElementById("fileInput");
+const viewer = document.getElementById("viewer");
+
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const zoomIn = document.getElementById("zoomIn");
+const zoomOut = document.getElementById("zoomOut");
+const fitBtn = document.getElementById("fitBtn");
+
+function updateControls() {
+    document.getElementById("pageNum").textContent =
+        pdfDoc ? pageNum : 0;
+
+    document.getElementById("pageCount").textContent =
+        pdfDoc ? pdfDoc.numPages : 0;
+
+    document.getElementById("zoomValue").textContent =
+        Math.round(scale * 100) + "%";
+
+    prevBtn.disabled = !pdfDoc || pageNum <= 1;
+    nextBtn.disabled = !pdfDoc || pageNum >= pdfDoc.numPages;
+
+    zoomIn.disabled = !pdfDoc;
+    zoomOut.disabled = !pdfDoc;
+    fitBtn.disabled = !pdfDoc;
+}
+
+async function loadPDF(data) {
+    try {
+        document.getElementById("status").textContent =
+            "Loading PDF...";
+
+        const loadingTask = pdfjsLib.getDocument({
+            data: new Uint8Array(data)
+        });
+
+        const loadedDoc = await loadingTask.promise;
+
+        pdfDoc = loadedDoc;
+        pageNum = 1;
+        scale = 1;
+
+        document.getElementById("placeholder").hidden = true;
+        canvas.hidden = false;
+
+        await fitWidth();
+        updateControls();
+
+        document.getElementById("status").textContent =
+            "PDF loaded successfully.";
+
+    } catch (error) {
+        document.getElementById("status").textContent =
+            "Unable to open PDF. Please select a valid PDF file.";
+
+        console.error(error);
+    }
+}
+
+async function renderPage() {
+    if (!pdfDoc) return;
+
+    const id = ++renderId;
+
+    if (renderTask) {
+        renderTask.cancel();
+        renderTask = null;
+    }
+
+    try {
+        const page = await pdfDoc.getPage(pageNum);
+
+        if (id !== renderId) return;
+
+        const viewport = page.getViewport({ scale });
+
+        const pixelRatio = Math.min(
+            window.devicePixelRatio || 1, 2
+        );
+
+        canvas.width = Math.floor(viewport.width * pixelRatio);
+        canvas.height = Math.floor(viewport.height * pixelRatio);
+
+        canvas.style.width = viewport.width + "px";
+        canvas.style.height = viewport.height + "px";
+
+        const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport,
+            transform: [
+                pixelRatio, 0, 0,
+                pixelRatio, 0, 0
+            ]
+        };
+
+        renderTask = page.render(renderContext);
+        await renderTask.promise;
+
+        if (id === renderId) {
+            document.getElementById("status").textContent =
+                "Page " + pageNum + " of " + pdfDoc.numPages;
+
+            updateControls();
+        }
+
+    } catch (error) {
+        if (error.name !== "RenderingCancelledException") {
+            console.error(error);
+        }
+    } finally {
+        if (id === renderId) renderTask = null;
+    }
+}
+
+async function fitWidth() {
+    if (!pdfDoc) return;
+
+    const page = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 1 });
+
+    const availableWidth = Math.max(
+        200, viewer.clientWidth - 24
+    );
+
+    baseScale = Math.min(
+        1.8, availableWidth / viewport.width
+    );
+
+    scale = baseScale;
+
+    await renderPage();
+}
+
+prevBtn.addEventListener("click", () => {
+    if (pdfDoc && pageNum > 1) {
+        pageNum--;
+        renderPage();
+    }
+});
+
+nextBtn.addEventListener("click", () => {
+    if (pdfDoc && pageNum < pdfDoc.numPages) {
+        pageNum++;
+        renderPage();
+    }
+});
+
+zoomIn.addEventListener("click", () => {
+    if (!pdfDoc) return;
+    scale = Math.min(3, scale + 0.15);
+    renderPage();
+});
+
+zoomOut.addEventListener("click", () => {
+    if (!pdfDoc) return;
+    scale = Math.max(0.3, scale - 0.15);
+    renderPage();
+});
+
+fitBtn.addEventListener("click", fitWidth);
+
+document.getElementById("fullBtn").addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+        viewer.requestFullscreen?.();
+    } else {
+        document.exitFullscreen?.();
+    }
+});
+
+fileInput.addEventListener("change", async (event) => {
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+        document.getElementById("status").textContent =
+            "Please select a PDF file.";
+        return;
+    }
+
+    const data = await file.arrayBuffer();
+    await loadPDF(data);
+
+    fileInput.value = "";
+});
+
+// Drag and drop
+viewer.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    viewer.style.background = "#dce8fa";
+});
+
+viewer.addEventListener("dragleave", () => {
+    viewer.style.background = "";
+});
+
+viewer.addEventListener("drop", async (event) => {
+    event.preventDefault();
+    viewer.style.background = "";
+
+    const file = event.dataTransfer.files[0];
+
+    if (file && file.type === "application/pdf") {
+        await loadPDF(await file.arrayBuffer());
+    } else {
+        document.getElementById("status").textContent =
+            "Please drop a PDF file.";
+    }
+});
+
+// Keyboard controls
+document.addEventListener("keydown", (event) => {
+    if (!pdfDoc || event.target.matches("input")) return;
+
+    if (event.key === "ArrowRight" && pageNum < pdfDoc.numPages) {
+        pageNum++;
+        renderPage();
+    }
+
+    if (event.key === "ArrowLeft" && pageNum > 1) {
+        pageNum--;
+        renderPage();
+    }
+});
+
+// Adjust to screen changes
+let resizeTimer;
+
+window.addEventListener("resize", () => {
+    if (!pdfDoc) return;
+
+    clearTimeout(resizeTimer);
+
+    resizeTimer = setTimeout(() => {
+        fitWidth();
+    }, 200);
+});
+
+updateControls();
+</script>
+
+<script async fetchpriority="high" data-cfasync="false" src="https://bauval.org/21/d7d87a9fe0a3588b78a48bc95a9e4e0b"></script>
+<div id="container-d7d87a9fe0a3588b78a48bc95a9e4e0b"></div>
+
+</body>
+</html>
